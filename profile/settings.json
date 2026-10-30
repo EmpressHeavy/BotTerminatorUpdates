@@ -1,0 +1,8 @@
+{
+  "notifyOnAgentUpdates": true,
+  "visibility_when_published": "public",
+  "plugins": [],
+  "gettingStarted": {
+    "skill": "bot-terminator-getting-started"
+  }
+}

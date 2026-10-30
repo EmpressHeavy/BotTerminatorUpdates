@@ -1,0 +1,5 @@
+# ONLY for running the package OUTSIDE Grok Bot (manual Google key fallback). Inside Grok Bot the Google Sheets
+# connector is required and these are not needed. Not installed or tested against a real login yet.
+google-api-python-client>=2.0
+google-auth>=2.0
+google-auth-oauthlib>=1.0

@@ -1,0 +1,1 @@
+# Bot Terminator needs only the Python standard library (v3.5.5: no Word/HTML reports).

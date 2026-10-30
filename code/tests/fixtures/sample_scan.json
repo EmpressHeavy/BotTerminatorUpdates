@@ -1,0 +1,886 @@
+{
+ "_note": "Slim test fixture derived from a real follower scan. Every follower handle, display name and user ID is replaced by a consistent made-up value (sample_user_NN, ids 1000000NNN); profile/avatar URLs and bios are dropped. Counts, dates, signals, classifications and decisions are kept.",
+ "card_snapshot": {
+  "snapshot_id": "sample_snapshot_cards",
+  "candidates": [
+   {
+    "username": "sample_user_01",
+    "name": "Sample User 01",
+    "user_id": "1000000001",
+    "followers": 2,
+    "following": 23,
+    "post_count": 17,
+    "joined": "2025-07-28",
+    "days_inactive": 0,
+    "label": "BOT-LIKE / REMOVE CANDIDATE",
+    "signals": [
+     "Unverified",
+     "You follow: No (source: browser 'Follow back' button 2026-10-16 3:38 PM PT)",
+     "Sparse/incomplete profile",
+     "Account based in: Not available",
+     "Very high repost ratio",
+     "Almost no conversational activity",
+     "Activity stats are SAMPLE (n=10)"
+    ],
+    "verified_type": "none",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 1,
+    "ratio": 0.087,
+    "stage": "stage2"
+   },
+   {
+    "username": "sample_user_02",
+    "name": "Sample User 02",
+    "user_id": "1000000002",
+    "followers": 27,
+    "following": 234,
+    "post_count": 22,
+    "joined": "2025-01-02",
+    "days_inactive": 6,
+    "label": "BOT-LIKE / REMOVE CANDIDATE",
+    "signals": [
+     "Unverified",
+     "You follow: No (source: browser 'Follow back' button 2026-10-16 3:38 PM PT)",
+     "Sparse/incomplete profile",
+     "Account based in: Not available",
+     "Very high repost ratio",
+     "Almost no conversational activity",
+     "Activity stats are SAMPLE (n=9)"
+    ],
+    "verified_type": "none",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 2,
+    "ratio": 0.115,
+    "stage": "stage2"
+   },
+   {
+    "username": "sample_user_03",
+    "name": "Sample User 03",
+    "user_id": "1000000003",
+    "followers": 1,
+    "following": 206,
+    "post_count": 202,
+    "joined": "2026-02-14",
+    "days_inactive": 14,
+    "label": "BOT-LIKE / REMOVE CANDIDATE",
+    "signals": [
+     "Unverified",
+     "You follow: No (source: browser 'Follow back' button 2026-10-16 3:38 PM PT)",
+     "Possible celebrity-name impersonation pattern",
+     "Account based in: Not available",
+     "Very high repost ratio",
+     "Almost no conversational activity",
+     "Activity stats are SAMPLE (n=10)"
+    ],
+    "verified_type": "none",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 3,
+    "ratio": 0.005,
+    "stage": "stage2"
+   },
+   {
+    "username": "sample_user_04",
+    "name": "Sample User 04",
+    "user_id": "1000000004",
+    "followers": 206,
+    "following": 3935,
+    "post_count": 120,
+    "joined": "2019-09-26",
+    "days_inactive": 4,
+    "label": "REVIEW",
+    "signals": [
+     "Unverified",
+     "You follow: No (source: browser 'Follow back' button 2026-10-16 3:38 PM PT)",
+     "High following vs followers",
+     "Sparse/incomplete profile",
+     "Account based in: Not available",
+     "Activity stats are SAMPLE (n=1)"
+    ],
+    "verified_type": "none",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 4,
+    "ratio": 0.052,
+    "stage": "stage2"
+   },
+   {
+    "username": "sample_user_05",
+    "name": "Sample User 05",
+    "user_id": "1000000005",
+    "followers": 5,
+    "following": 61,
+    "post_count": 8,
+    "joined": "2026-10-09",
+    "days_inactive": 6,
+    "label": "REVIEW",
+    "signals": [
+     "Unverified",
+     "You follow: No (source: browser 'Follow back' button 2026-10-16 3:38 PM PT)",
+     "Very new account (<30d)",
+     "Sparse/incomplete profile",
+     "Account based in: Not available",
+     "Activity stats are SAMPLE (n=8)"
+    ],
+    "verified_type": "none",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 5,
+    "ratio": 0.082,
+    "stage": "stage2"
+   },
+   {
+    "username": "sample_user_06",
+    "name": "Sample User 06",
+    "user_id": "1000000006",
+    "followers": 7,
+    "following": 516,
+    "post_count": 16,
+    "joined": "2026-10-07",
+    "days_inactive": 0,
+    "label": "REVIEW",
+    "signals": [
+     "Unverified",
+     "You follow: No (source: browser 'Follow back' button 2026-10-16 3:38 PM PT)",
+     "Very low followers with large following",
+     "Very new account (<30d)",
+     "Account based in: Not available",
+     "Activity stats are SAMPLE (n=10)"
+    ],
+    "verified_type": "none",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 6,
+    "ratio": 0.014,
+    "stage": "stage2"
+   },
+   {
+    "username": "sample_user_07",
+    "name": "Sample User 07",
+    "user_id": "1000000007",
+    "followers": 34,
+    "following": 130,
+    "post_count": 683,
+    "joined": "2026-09-27",
+    "days_inactive": 0,
+    "label": "REVIEW",
+    "signals": [
+     "Unverified",
+     "You follow: No (source: browser 'Follow back' button 2026-10-16 3:38 PM PT)",
+     "Very new account (<30d)",
+     "Sparse/incomplete profile",
+     "Account based in: Not available",
+     "Activity stats are SAMPLE (n=10)"
+    ],
+    "verified_type": "none",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 7,
+    "ratio": 0.262,
+    "stage": "stage2"
+   },
+   {
+    "username": "sample_user_08",
+    "name": "Sample User 08",
+    "user_id": "1000000008",
+    "followers": 24,
+    "following": 16,
+    "post_count": 329,
+    "joined": "2026-10-08",
+    "days_inactive": 3,
+    "label": "REVIEW",
+    "signals": [
+     "Unverified",
+     "You follow: No (source: browser 'Follow back' button 2026-10-16 3:38 PM PT)",
+     "Very new account (<30d)",
+     "Sparse/incomplete profile",
+     "Account based in: Not available",
+     "Activity stats are SAMPLE (n=10)"
+    ],
+    "verified_type": "none",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 8,
+    "ratio": 1.5,
+    "stage": "stage2"
+   },
+   {
+    "username": "sample_user_09",
+    "name": "Sample User 09",
+    "user_id": "1000000009",
+    "followers": 329,
+    "following": 7491,
+    "post_count": 1319,
+    "joined": "2026-01-06",
+    "days_inactive": 30,
+    "label": "REVIEW",
+    "signals": [
+     "Unverified",
+     "You follow: No (source: browser 'Follow back' button 2026-10-16 3:38 PM PT)",
+     "Extreme following ratio",
+     "Account based in: Not available",
+     "30-day activity: Not available / insufficient"
+    ],
+    "verified_type": "none",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 9,
+    "ratio": 0.044,
+    "stage": "stage2"
+   },
+   {
+    "username": "sample_user_10",
+    "name": "Sample User 10",
+    "user_id": "1000000010",
+    "followers": 16,
+    "following": 125,
+    "post_count": 0,
+    "joined": "2025-06-10",
+    "days_inactive": null,
+    "label": "REVIEW",
+    "signals": [
+     "Unverified",
+     "You follow: No (source: browser 'Follow back' button 2026-10-16 3:38 PM PT)",
+     "Zero posts",
+     "Sparse/incomplete profile",
+     "Account based in: Not available",
+     "30-day activity: Not available / insufficient"
+    ],
+    "verified_type": "none",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 10,
+    "ratio": 0.128,
+    "stage": "stage2"
+   },
+   {
+    "username": "sample_user_11",
+    "name": "Sample User 11",
+    "user_id": "1000000011",
+    "followers": 362,
+    "following": 898,
+    "post_count": 22005,
+    "joined": "2025-12-02",
+    "days_inactive": 0,
+    "label": "KEEP",
+    "signals": [
+     "Verified \u2014 excluded from removal pool"
+    ],
+    "verified_type": "blue",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 11,
+    "ratio": 0.403,
+    "stage": "protected"
+   },
+   {
+    "username": "sample_user_12",
+    "name": "Sample User 12",
+    "user_id": "1000000012",
+    "followers": 46,
+    "following": 49,
+    "post_count": 546,
+    "joined": "2025-11-18",
+    "days_inactive": 0,
+    "label": "KEEP",
+    "signals": [
+     "Verified \u2014 excluded from removal pool"
+    ],
+    "verified_type": "blue",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 12,
+    "ratio": 0.939,
+    "stage": "protected"
+   },
+   {
+    "username": "sample_user_13",
+    "name": "Sample User 13",
+    "user_id": "1000000013",
+    "followers": 1588,
+    "following": 4660,
+    "post_count": 1,
+    "joined": "2025-12-12",
+    "days_inactive": 284,
+    "label": "KEEP",
+    "signals": [
+     "Verified \u2014 excluded from removal pool"
+    ],
+    "verified_type": "blue",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 13,
+    "ratio": 0.341,
+    "stage": "protected"
+   },
+   {
+    "username": "sample_user_14",
+    "name": "Sample User 14",
+    "user_id": "1000000014",
+    "followers": 928,
+    "following": 2723,
+    "post_count": 0,
+    "joined": "2015-02-28",
+    "days_inactive": null,
+    "label": "KEEP",
+    "signals": [
+     "Verified \u2014 excluded from removal pool"
+    ],
+    "verified_type": "blue",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 14,
+    "ratio": 0.341,
+    "stage": "protected"
+   },
+   {
+    "username": "sample_user_15",
+    "name": "Sample User 15",
+    "user_id": "1000000015",
+    "followers": 335,
+    "following": 2604,
+    "post_count": 626,
+    "joined": "2025-04-20",
+    "days_inactive": 0,
+    "label": "KEEP",
+    "signals": [
+     "Verified \u2014 excluded from removal pool"
+    ],
+    "verified_type": "blue",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 15,
+    "ratio": 0.129,
+    "stage": "protected"
+   },
+   {
+    "username": "sample_user_16",
+    "name": "Sample User 16",
+    "user_id": "1000000016",
+    "followers": 26,
+    "following": 202,
+    "post_count": 54,
+    "joined": "2024-09-03",
+    "days_inactive": 0,
+    "label": "KEEP",
+    "signals": [
+     "Verified \u2014 excluded from removal pool"
+    ],
+    "verified_type": "blue",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 16,
+    "ratio": 0.129,
+    "stage": "protected"
+   },
+   {
+    "username": "sample_user_17",
+    "name": "Sample User 17",
+    "user_id": "1000000017",
+    "followers": 699,
+    "following": 2332,
+    "post_count": 3547,
+    "joined": "2025-07-08",
+    "days_inactive": 0,
+    "label": "KEEP",
+    "signals": [
+     "Verified \u2014 excluded from removal pool"
+    ],
+    "verified_type": "blue",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 17,
+    "ratio": 0.3,
+    "stage": "protected"
+   },
+   {
+    "username": "sample_user_18",
+    "name": "Sample User 18",
+    "user_id": "1000000018",
+    "followers": 1060,
+    "following": 1765,
+    "post_count": 26259,
+    "joined": "2024-11-22",
+    "days_inactive": 0,
+    "label": "KEEP",
+    "signals": [
+     "Unverified",
+     "You follow: No (source: browser 'Follow back' button 2026-10-16 3:38 PM PT)",
+     "Cleared Stage 1 cheap screen"
+    ],
+    "verified_type": "none",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 18,
+    "ratio": 0.601,
+    "stage": "stage1_keep"
+   },
+   {
+    "username": "sample_user_19",
+    "name": "Sample User 19",
+    "user_id": "1000000019",
+    "followers": 2138,
+    "following": 1258,
+    "post_count": 24737,
+    "joined": "2011-08-26",
+    "days_inactive": 0,
+    "label": "KEEP",
+    "signals": [
+     "Unverified",
+     "You follow: No (source: browser 'Follow back' button 2026-10-16 3:38 PM PT)",
+     "Cleared Stage 1 cheap screen"
+    ],
+    "verified_type": "none",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 19,
+    "ratio": 1.7,
+    "stage": "stage1_keep"
+   },
+   {
+    "username": "sample_user_20",
+    "name": "Sample User 20",
+    "user_id": "1000000020",
+    "followers": 1686,
+    "following": 1697,
+    "post_count": 3775,
+    "joined": "2022-10-15",
+    "days_inactive": 39,
+    "label": "KEEP",
+    "signals": [
+     "Unverified",
+     "You follow: No (source: browser 'Follow back' button 2026-10-16 3:38 PM PT)",
+     "Cleared Stage 1 cheap screen"
+    ],
+    "verified_type": "none",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 20,
+    "ratio": 0.994,
+    "stage": "stage1_keep"
+   },
+   {
+    "username": "sample_user_21",
+    "name": "Sample User 21",
+    "user_id": "1000000021",
+    "followers": 33,
+    "following": 50,
+    "post_count": 613,
+    "joined": "2026-03-25",
+    "days_inactive": 0,
+    "label": "KEEP",
+    "signals": [
+     "Unverified",
+     "You follow: No (source: browser 'Follow back' button 2026-10-16 3:38 PM PT)",
+     "Cleared Stage 1 cheap screen"
+    ],
+    "verified_type": "none",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 21,
+    "ratio": 0.66,
+    "stage": "stage1_keep"
+   },
+   {
+    "username": "sample_user_22",
+    "name": "Sample User 22",
+    "user_id": "1000000022",
+    "followers": 25,
+    "following": 142,
+    "post_count": 95,
+    "joined": "2025-05-20",
+    "days_inactive": 60,
+    "label": "KEEP",
+    "signals": [
+     "Unverified",
+     "You follow: No (source: browser 'Follow back' button 2026-10-16 3:38 PM PT)",
+     "Cleared Stage 1 cheap screen"
+    ],
+    "verified_type": "none",
+    "i_follow": false,
+    "always_keep": false,
+    "review_number": 22,
+    "ratio": 0.176,
+    "stage": "stage1_keep"
+   }
+  ]
+ },
+ "eval_alpha_v1": {
+  "dataset_id": "alpha_v1",
+  "snapshot_id": "snap_example_eval_001",
+  "examples": [
+   {
+    "review_number": 1,
+    "username": "sample_user_23",
+    "alpha_test_label_only": true,
+    "evidence": {
+     "followers": 166,
+     "following": 4827,
+     "post_count": 41,
+     "joined": "2022-10-01",
+     "verified": false,
+     "followed_by_me": false
+    },
+    "classifier_result": {
+     "flag": "bot",
+     "label": "BOT-LIKE / REMOVE CANDIDATE",
+     "signals": [
+      "Unverified",
+      "Extreme following ratio",
+      "Sparse/incomplete profile",
+      "Account based in: Not available",
+      "30-day activity: Not available / insufficient"
+     ],
+     "stage": "stage2",
+     "ratio": 0.03439
+    },
+    "human_decision": {
+     "decision": "APPROVED_REMOVAL_CANDIDATE",
+     "executed": false,
+     "recorded_at": "2026-09-30T15:08:41.783766-07:00"
+    }
+   },
+   {
+    "review_number": 2,
+    "username": "sample_user_24",
+    "alpha_test_label_only": true,
+    "evidence": {
+     "followers": 183,
+     "following": 3784,
+     "post_count": 435,
+     "joined": "2017-08-01",
+     "verified": false,
+     "followed_by_me": false
+    },
+    "classifier_result": {
+     "flag": "bot",
+     "label": "BOT-LIKE / REMOVE CANDIDATE",
+     "signals": [
+      "Unverified",
+      "Extreme following ratio",
+      "Sparse/incomplete profile",
+      "Account based in: Not available",
+      "30-day activity: Not available / insufficient"
+     ],
+     "stage": "stage2",
+     "ratio": 0.048362
+    },
+    "human_decision": {
+     "decision": "APPROVED_REMOVAL_CANDIDATE",
+     "executed": false,
+     "recorded_at": "2026-09-30T15:08:41.783778-07:00"
+    }
+   },
+   {
+    "review_number": 3,
+    "username": "sample_user_25",
+    "alpha_test_label_only": true,
+    "evidence": {
+     "followers": 0,
+     "following": 2,
+     "post_count": 0,
+     "joined": "2026-09-01",
+     "verified": false,
+     "followed_by_me": false
+    },
+    "classifier_result": {
+     "flag": "bot",
+     "label": "BOT-LIKE / REMOVE CANDIDATE",
+     "signals": [
+      "Unverified",
+      "Very new account (<30d)",
+      "Zero posts",
+      "Sparse/incomplete profile",
+      "Account based in: Not available",
+      "30-day activity: Not available / insufficient"
+     ],
+     "stage": "stage2",
+     "ratio": 0.0
+    },
+    "human_decision": {
+     "decision": "APPROVED_REMOVAL_CANDIDATE",
+     "executed": false,
+     "recorded_at": "2026-09-30T15:08:41.783781-07:00"
+    }
+   },
+   {
+    "review_number": 4,
+    "username": "sample_user_26",
+    "alpha_test_label_only": true,
+    "evidence": {
+     "followers": 153,
+     "following": 1586,
+     "post_count": 9,
+     "joined": "2026-09-01",
+     "verified": false,
+     "followed_by_me": false
+    },
+    "classifier_result": {
+     "flag": "bot",
+     "label": "BOT-LIKE / REMOVE CANDIDATE",
+     "signals": [
+      "Unverified",
+      "High following vs followers",
+      "Very new account (<30d)",
+      "Sparse/incomplete profile",
+      "Account based in: Not available",
+      "30-day activity: Not available / insufficient"
+     ],
+     "stage": "stage2",
+     "ratio": 0.096469
+    },
+    "human_decision": {
+     "decision": "APPROVED_REMOVAL_CANDIDATE",
+     "executed": false,
+     "recorded_at": "2026-09-30T15:08:41.783782-07:00"
+    }
+   },
+   {
+    "review_number": 5,
+    "username": "sample_user_27",
+    "alpha_test_label_only": true,
+    "evidence": {
+     "followers": 29,
+     "following": 44,
+     "post_count": 38,
+     "joined": "2026-08-01",
+     "verified": false,
+     "followed_by_me": false
+    },
+    "classifier_result": {
+     "flag": "bot",
+     "label": "BOT-LIKE / REMOVE CANDIDATE",
+     "signals": [
+      "Unverified",
+      "Possible celebrity-name impersonation pattern",
+      "Account based in: Not available",
+      "30-day activity: Not available / insufficient"
+     ],
+     "stage": "stage2",
+     "ratio": 0.659091
+    },
+    "human_decision": {
+     "decision": "APPROVED_REMOVAL_CANDIDATE",
+     "executed": false,
+     "recorded_at": "2026-09-30T15:08:41.783784-07:00"
+    }
+   },
+   {
+    "review_number": 6,
+    "username": "sample_user_28",
+    "alpha_test_label_only": true,
+    "evidence": {
+     "followers": 398,
+     "following": 205,
+     "post_count": 757,
+     "joined": "2026-06-01",
+     "verified": false,
+     "followed_by_me": false
+    },
+    "classifier_result": {
+     "flag": "review",
+     "label": "REVIEW",
+     "signals": [
+      "Unverified",
+      "Sparse/incomplete profile",
+      "Account based in: Not available",
+      "30-day activity: Not available / insufficient"
+     ],
+     "stage": "stage2",
+     "ratio": 1.941463
+    },
+    "human_decision": {
+     "decision": "APPROVED_REMOVAL_CANDIDATE",
+     "executed": false,
+     "recorded_at": "2026-09-30T15:08:41.783785-07:00"
+    }
+   },
+   {
+    "review_number": 7,
+    "username": "sample_user_29",
+    "alpha_test_label_only": true,
+    "evidence": {
+     "followers": 42,
+     "following": 811,
+     "post_count": 596,
+     "joined": "2021-12-01",
+     "verified": false,
+     "followed_by_me": false
+    },
+    "classifier_result": {
+     "flag": "review",
+     "label": "REVIEW",
+     "signals": [
+      "Unverified",
+      "High following vs followers",
+      "Sparse/incomplete profile",
+      "Account based in: Not available",
+      "30-day activity: Not available / insufficient"
+     ],
+     "stage": "stage2",
+     "ratio": 0.051788
+    },
+    "human_decision": {
+     "decision": "APPROVED_REMOVAL_CANDIDATE",
+     "executed": false,
+     "recorded_at": "2026-09-30T15:08:41.783789-07:00"
+    }
+   },
+   {
+    "review_number": 8,
+    "username": "sample_user_30",
+    "alpha_test_label_only": true,
+    "evidence": {
+     "followers": 781,
+     "following": 4819,
+     "post_count": 469,
+     "joined": "2026-07-01",
+     "verified": false,
+     "followed_by_me": false
+    },
+    "classifier_result": {
+     "flag": "review",
+     "label": "REVIEW",
+     "signals": [
+      "Unverified",
+      "Sparse/incomplete profile",
+      "Account based in: Not available",
+      "30-day activity: Not available / insufficient"
+     ],
+     "stage": "stage2",
+     "ratio": 0.162067
+    },
+    "human_decision": {
+     "decision": "APPROVED_REMOVAL_CANDIDATE",
+     "executed": false,
+     "recorded_at": "2026-09-30T15:08:41.783790-07:00"
+    }
+   },
+   {
+    "review_number": 9,
+    "username": "sample_user_31",
+    "alpha_test_label_only": true,
+    "evidence": {
+     "followers": 136,
+     "following": 83,
+     "post_count": 1001,
+     "joined": "2022-10-01",
+     "verified": false,
+     "followed_by_me": false
+    },
+    "classifier_result": {
+     "flag": "review",
+     "label": "REVIEW",
+     "signals": [
+      "Unverified",
+      "Sparse/incomplete profile",
+      "Account based in: Not available",
+      "30-day activity: Not available / insufficient"
+     ],
+     "stage": "stage2",
+     "ratio": 1.638554
+    },
+    "human_decision": {
+     "decision": "APPROVED_REMOVAL_CANDIDATE",
+     "executed": false,
+     "recorded_at": "2026-09-30T15:08:41.783791-07:00"
+    }
+   },
+   {
+    "review_number": 10,
+    "username": "sample_user_32",
+    "alpha_test_label_only": true,
+    "evidence": {
+     "followers": 155,
+     "following": 323,
+     "post_count": 1056,
+     "joined": "2026-09-01",
+     "verified": false,
+     "followed_by_me": false
+    },
+    "classifier_result": {
+     "flag": "review",
+     "label": "REVIEW",
+     "signals": [
+      "Unverified",
+      "Very new account (<30d)",
+      "Sparse/incomplete profile",
+      "Account based in: Not available",
+      "30-day activity: Not available / insufficient"
+     ],
+     "stage": "stage2",
+     "ratio": 0.479876
+    },
+    "human_decision": {
+     "decision": "APPROVED_REMOVAL_CANDIDATE",
+     "executed": false,
+     "recorded_at": "2026-09-30T15:08:41.783792-07:00"
+    }
+   }
+  ],
+  "decisions": {
+   "1": {
+    "review_number": 1,
+    "username": "sample_user_23",
+    "decision": "APPROVED_REMOVAL_CANDIDATE",
+    "executed": false
+   },
+   "2": {
+    "review_number": 2,
+    "username": "sample_user_24",
+    "decision": "APPROVED_REMOVAL_CANDIDATE",
+    "executed": false
+   },
+   "3": {
+    "review_number": 3,
+    "username": "sample_user_25",
+    "decision": "APPROVED_REMOVAL_CANDIDATE",
+    "executed": false
+   },
+   "4": {
+    "review_number": 4,
+    "username": "sample_user_26",
+    "decision": "APPROVED_REMOVAL_CANDIDATE",
+    "executed": false
+   },
+   "5": {
+    "review_number": 5,
+    "username": "sample_user_27",
+    "decision": "APPROVED_REMOVAL_CANDIDATE",
+    "executed": false
+   },
+   "6": {
+    "review_number": 6,
+    "username": "sample_user_28",
+    "decision": "APPROVED_REMOVAL_CANDIDATE",
+    "executed": false
+   },
+   "7": {
+    "review_number": 7,
+    "username": "sample_user_29",
+    "decision": "APPROVED_REMOVAL_CANDIDATE",
+    "executed": false
+   },
+   "8": {
+    "review_number": 8,
+    "username": "sample_user_30",
+    "decision": "APPROVED_REMOVAL_CANDIDATE",
+    "executed": false
+   },
+   "9": {
+    "review_number": 9,
+    "username": "sample_user_31",
+    "decision": "APPROVED_REMOVAL_CANDIDATE",
+    "executed": false
+   },
+   "10": {
+    "review_number": 10,
+    "username": "sample_user_32",
+    "decision": "APPROVED_REMOVAL_CANDIDATE",
+    "executed": false
+   }
+  }
+ }
+}

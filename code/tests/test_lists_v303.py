@@ -161,6 +161,9 @@ def test_every_card_builder_has_at_most_six_options(root, beta_env):
     import terminate_reminder as tr
     chk("terminate_reminder.card", [o["label"] for o in tr.card()["options"]])
     chk("terminate_reminder.time_card", [o["label"] for o in tr.time_card()["options"]])
+    import hive_setup as hs
+    chk("hive_setup.off_request_card", hs.off_request_card()["buttons"])
+    chk("build_monthly_settings_card.build_toggle_card", bmc.build_toggle_card({}, True)["options"])
     assert set(checked) == EXPECTED_BUILDERS
 
 
@@ -171,7 +174,8 @@ EXPECTED_BUILDERS = {"lists_scan.scope_card", "list_cards.build_cards", "list_ca
                      "inactive_mutuals.build_card", "build_monthly_settings_card.build",
                      "build_monthly_settings_card.build(prior)",
                      "terminate_reminder.card", "terminate_reminder.time_card",
-                     "records.setup_card", "records.upgrade_card", "records.migration_card"}
+                     "records.setup_card", "records.upgrade_card", "records.migration_card",
+                     "hive_setup.off_request_card", "build_monthly_settings_card.build_toggle_card"}
 
 
 def test_no_unlisted_card_builder_in_src():
@@ -184,4 +188,4 @@ def test_no_unlisted_card_builder_in_src():
 
 EXPECTED_FILES = {"lists_scan.py", "list_cards.py", "build_candidate_cards.py", "review_followup.py",
                   "graveyard_return_cards.py", "graveyard_returns.py", "inactive_mutuals.py",
-                  "build_monthly_settings_card.py", "terminate_reminder.py", "records.py"}
+                  "build_monthly_settings_card.py", "terminate_reminder.py", "records.py", "hive_setup.py"}

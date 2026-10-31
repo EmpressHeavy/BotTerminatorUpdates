@@ -1,4 +1,4 @@
-# v3.5.16 parity map
+# v3.5.17 parity map
 | Component | Repo location |
 |---|---|
 | Agent profile (name, title, description, welcome message, avatar shape/color) | `profile/profile.json`, `profile/welcome_message.txt` (generic) |
@@ -14,7 +14,7 @@
 | Install steps and dependencies | `code/README.md`, `code/requirements*.txt`, `UPGRADE.md` step 2 |
 | Package integrity | `code/tools/verify_package.py`, fingerprint in the getting-started skill |
 | Tests (476 pass, 1 skipped) | `code/tests/` |
-| Hive Mind (send-only client, opt-in, bot code bt) | `skills/hive-mind/SKILL.md`, `hive/hive.py`, `hive/README.md`, `code/hive/`, `code/tools/install_hive.sh` |
+| Hive Mind (send-only client, on by default, bot code bt) | `skills/hive-mind/SKILL.md`, `hive/hive.py`, `hive/README.md`, `code/hive/`, `code/tools/install_hive.sh` |
 | Creator feedback | `hive/README.md`, monthly prompt |
 | Routines and prompts | `routines/routines.md`, `routines/routine-prompts.md` |
 | Automatic weekly updates (mandatory, always on) | `routines/weekly-update-check.md`, `UPGRADE.md` section A, skill "Automatic updates", monthly check re-creates it |

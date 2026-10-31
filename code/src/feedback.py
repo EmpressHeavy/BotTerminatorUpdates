@@ -16,7 +16,7 @@ try:
 except ImportError:  # pragma: no cover
     import memory
 
-TEMPLATE_VERSION = "v3.5.16"
+TEMPLATE_VERSION = "v3.5.17"
 SUBJECT = "Bot Terminator feedback"
 OFFER = ("Want me to send this to Bot Terminator's creator as anonymous feedback? I'll show you exactly what will "
          "be sent first. (yes / no thanks)")

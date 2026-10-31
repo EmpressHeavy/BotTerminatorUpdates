@@ -1,35 +1,36 @@
 ---
 name: hive-mind
-description: Optional, anonymous, send-only sharing of Bot Terminator lessons and owner feedback with its creator (bot code bt, default off). Use during first-run setup (install the client and offer it), when something failed and a different approach worked, when the owner corrects the bot, declines or requests a feature or reports something broken, when they ask about Hive Mind or what was shared, in the monthly settings check, and in the weekly routine that runs `hive auto`.
+description: Anonymous, send-only sharing of Bot Terminator lessons and owner feedback with its creator (bot code bt, ON by default since v3.5.17). Use during first-run setup (install the client, turn it on, send the notice); when the owner asks to turn it off or on; EVERY time the owner corrects the bot, asks it to do something a different way, declines a feature, requests a feature, reports something broken, or uses a workaround, even once (record a Hive item); whenever something failed and a different approach then worked (record the lesson); when the user asks about Hive Mind, sharing, privacy, or what was shared; in the monthly settings check; and in the weekly routine that runs `hive auto`.
 ---
-# Hive Mind (opt-in lesson and owner-feedback sharing)
+# Hive Mind (on by default: lesson and owner-feedback sharing)
 
 ## What it is
 Your bot keeps two kinds of Hive items in its private memory (`~/memory/brain.db`, table `lesson`, column `kind`):
 - **Lessons** (kind `lesson`): something failed and a different approach then worked (avoid X -> do Y).
 - **Owner feedback** (kinds `correction`, `request`, `declined`, `broken`, `workaround`): any time the owner has the bot do something differently from how it was built to work. This is the creator's only direct line to owners: the Marketplace has no developer-to-user support channel, and feedback posted on social media is easily missed. If it isn't recorded here, the creator will probably never know.
 
-With Hive Mind turned on, the bot shares a cleaned-up, anonymized copy of these items with the bot's creator, so the next template update can fix what's broken, add what owners ask for, and ship fixes to everyone in the next update. It is OFF by default. Once the user opts in, the bot sends one anonymized batch about once a week automatically (no weekly approval), plus, only for something reported broken, at most one small urgent batch a day; the user can ask to see what was shared (`hive shared`) or turn it off anytime.
+With Hive Mind turned on, the bot shares a cleaned-up, anonymized copy of these items with the bot's creator, so the next template update can fix what's broken, add what owners ask for, and ship fixes to everyone in the next update. For Bot Terminator it is ON by default (v3.5.17). While it is on, the bot sends one anonymized batch about once a week automatically (no weekly approval), plus, only for something reported broken, at most one small urgent batch a day; the user can ask to see what was shared (`hive shared`) or turn it off anytime.
 
 ## Setup (once, after private memory exists)
 1. Private memory must already be set up (`~/memory/brain.db` from the private-memory-db skill). If it is missing, set that up first.
 2. If `~/memory/hive.py` is missing, install the Hive Mind client exactly as shipped in the Bot Terminator package (pinned tag, verified fingerprint): run `sh tools/install_hive.sh` from the package folder (`/workspace/bot-terminator/`, the update repo's `code/`). It copies `hive/hive.py` unchanged to `~/memory/hive.py` and writes the wrapper `~/bin/hive` (`#!/bin/sh` / `exec python3 "$HOME/memory/hive.py" "$@"`). Never edit hive.py. Then run `hive status` (this creates the `lesson`, `hive_state`, `hive_sent` and `hive_sent_h` tables if missing, and adds the `kind` column to an older `lesson` table). Use `~/bin/hive` if `hive` is not on PATH.
-3. Offer it during first-run setup with the "First-run offer" text below. It stays OFF unless the user clearly says yes. Only on a clear yes: `hive on --bot <code>` (DOGE = dg, Bot Terminator = bt, Playlist Converter = pc).
+3. During first-run setup, turn it on quietly: `hive on --bot bt`, confirm `hive status` shows enabled=1, and create the weekly "Hive Mind weekly share" routine (`hive auto`, silent unless it fails). No opt-in card, buttons or question; send only the notice below.
 4. `hive status` shows on/off, the anonymous id, the last week sent, the last urgent day and the template version. `hive off` stops everything at any time.
 5. Send-only: clones never receive, pull or import lessons. Improvements arrive only as versioned updates from the update repo (VERSION + UPGRADE.md).
 
 
-## First-run offer (say it as a suggestion, default off)
-"One optional suggestion: you can turn on the Hive Mind. It never saves your personal information, only anonymized lessons about what worked and what didn't, so future versions get smarter and more efficient. Once it's on, I send those lessons about once a week on my own; you can ask to see what was shared or switch it off anytime. Want it on? (yes / not now)"
-- Yes: `hive on --bot <code>`, then create a weekly routine that runs `hive auto`. Anything else (no, not now, silence): leave it off and don't ask again until the monthly settings check.
+## First-run notice (no card, no question)
+"Just so you are aware, Bot Terminator is equipped with a system called Hive Mind, which gets end-user feedback to my creator so you don't have to reach out via social media and risk your feedback getting missed. Hive Mind does NOT save any of your personal information, only anonymized lessons about what worked and what didn't, so future versions of me can get smarter and work more efficiently. I send those lessons about once a week on my own. :)"
 
-## Monthly settings reminder (add to the monthly settings check)
-- If `hive status` shows enabled=1: "Hive Mind: you're opted IN. It never saves your personal information, only anonymized lessons about what worked and what didn't, so future versions get smarter and more efficient. About once a week I send those lessons on my own; you can ask to see what was shared anytime. Want to keep it on, or switch it off?"
-- If enabled=0: "Hive Mind: you're opted OUT, so nothing is shared. It never saves your personal information, only anonymized lessons about what worked and what didn't, so future versions get smarter and more efficient. Want to switch it on? (yes / keep off)"
-- Act only on a clear answer: `hive on --bot <code>` or `hive off` (and remove the weekly routine). No answer means no change.
+## Only if the owner asks to turn it off
+Send a widget card whose prompt is exactly: "Why leave this on? It's a backup way to let my creator know what's working and what isn't, so they can improve me. Unless you tell the developer directly, they won't know something needs fixing, and there's no guarantee they'll see your feedback on social media. (We really hope they do, so may the algorithm be in your favor 🎲) Your personal info is never shared, and you can turn it off anytime."
+Buttons: **Keep Hive Mind on** (leave it on) and **Turn off Hive Mind** (run `hive off`, delete the "Hive Mind weekly share" routine, confirm in one line). If they later ask to turn it on: `hive on --bot bt` and recreate the routine.
+
+## Monthly settings check
+Show the Hive Mind status with all their other settings, plus the one-line reminder: "Hive Mind sends anonymized lessons about what worked and what didn't (never your personal info) about once a week, so future versions of me improve." Then list Hive Mind with its current state in the multi-select on/off card together with their other on/off settings, and flip only what they pick. No "Why leave this on?" nudge here. Keep the weekly routine only while Hive Mind is on.
 
 ## Recording owner feedback as you work (always, on or off, even if it happens only ONCE)
-Record a Hive item the moment the owner does any of these, whether or not Hive Mind is on (it stays private until they opt in):
+Record a Hive item the moment the owner does any of these, whether or not Hive Mind is on (it stays private while Hive Mind is off):
 - **Corrects you** or tells you that you did something wrong: `hive feedback add correction "topic" "what I did" "what the owner wanted instead"`.
 - **Asks for a different way** than the one you were built to use (a different storage, flow, format, schedule, card, wording or tool), or you change your approach because of what they said: also `correction`.
 - **Declines a feature or setup step** you offered (for example they don't want Google Sheets and want logging kept on the bot's own computer): `hive feedback add declined "topic" "what I offered" "what the owner wanted instead"`.
@@ -51,13 +52,13 @@ How to write it:
 - Before a task, check relevant lessons: `mem q "SELECT kind,topic,wrong,right FROM lesson WHERE status='current' ORDER BY uses DESC"`.
 
 ## Explaining it to the user (say it plainly)
-- Off unless you turn it on. You can turn it off any time with one sentence.
+- On by default. You can turn it off any time with one sentence.
 - Once it's on, I send one batch about once a week on my own (at most 20 short lines, under 8KB). If you tell me something is broken, I may send that one item sooner, at most once a day. You can ask to see everything that was shared (`hive shared`) or switch it off anytime.
 - What's included: lessons I've reused at least twice, and short notes about anything you asked me to do differently, declined, asked for, or reported broken, so my creator can fix it. Before sending, I remove emails, phone numbers, links, @handles, street addresses, IP addresses, file paths, key-like strings, and the names and facts stored in my memory, and replace them with tags like <EMAIL> or <NAME>. Any line that still looks sensitive is dropped completely.
 - You're identified only by a random id, salted and hashed on this computer. No name, email, or account is sent, and the upload needs no sign-in.
 - Each line includes the bot code, the kind (lesson, correction, request, declined, broken, workaround), topic, the "what happened" and "what was wanted / what worked" parts (150 characters max each), a rough usage bucket (1-4, 5-9, or 10+ uses), the template version, the anonymous id, a content hash, and the week number.
 
-## Weekly flow (automatic once opted in)
+## Weekly flow (automatic while on)
 1. The weekly routine runs `hive auto`. It sends only if enabled=1, nothing was sent this ISO week, and there are items to share (feedback with 1+ use, lessons with 2+ uses); otherwise it is a silent no-op. Don't message the user about routine sends.
 2. Urgent exception: if this week's batch already went out and there is a `broken` item that hasn't been sent yet, `hive auto` sends only those broken items (at most 5) as one urgent batch, at most once a day. The intake enforces the same limits.
 3. "What did you share?": run `hive shared` (all past batches and their result, stored locally) and show it unchanged.

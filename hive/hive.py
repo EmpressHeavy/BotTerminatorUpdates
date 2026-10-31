@@ -12,7 +12,7 @@ v3.5.12: template version bump only (the review tool fix is in tools/hive_review
 import sqlite3, sys, os, re, json, hashlib, secrets, datetime, urllib.request, urllib.error
 DB = os.environ.get('MEM_DB', os.path.expanduser('~/memory/brain.db'))
 URL = 'https://hive-mind-intake.empressheavy.workers.dev'
-TV = 'v3.5.16'
+TV = 'v3.5.17'
 CODES = {'dg': 'DOGE', 'bt': 'Bot Terminator', 'pc': 'Playlist Converter'}
 N2C = {v.lower(): k for k, v in CODES.items()}
 KINDS = ('lesson', 'correction', 'request', 'declined', 'broken', 'workaround')

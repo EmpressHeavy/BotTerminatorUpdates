@@ -29,7 +29,7 @@ Before touching anything copy `/workspace/bot-terminator/` (including `data/`), 
 1. `python3 --version` (3.8+), `git --version`.
 2. `git clone --depth 1 https://github.com/EmpressHeavy/BotTerminatorUpdates /workspace/bt-updates` (or `git -C /workspace/bt-updates pull` if it exists).
 3. `cd /workspace/bt-updates/code && python3 tools/verify_package.py <fingerprint from skills/bot-terminator-getting-started/SKILL.md>` must print OK. On mismatch, stop and tell the owner.
-4. Copy `code/` over `/workspace/bot-terminator/` **without touching `data/`** (e.g. `rsync -a --exclude data/ code/ /workspace/bot-terminator/`).
+4. Copy `code/` over `/workspace/bot-terminator/` **without touching `data/`** (e.g. `rsync -a --exclude data/ code/ /workspace/bot-terminator/`). **If rsync is not installed (it is not on the Grok Bot box), use cp instead:** `cd code && for f in $(ls -A | grep -vx data); do cp -a "$f" /workspace/bot-terminator/; done` (copies everything in `code/` except `data/`; never `cp -a code/. ...` with a `data/` folder present, and never delete `/workspace/bot-terminator/data/`).
 5. In `/workspace/bot-terminator/`: create/refresh a venv, `pip install -r requirements.txt`, run `python -m pytest -q` (0 failures). On failure, roll back.
 6. Schema: the code adds missing tables on first use; existing rows are never touched (`code/README.md`).
 
@@ -40,7 +40,7 @@ Install `skills/bot-terminator-getting-started/SKILL.md` and `skills/hive-mind/S
 Keep everything. Run `MEM_USER=<user_key> tools/mem boot`. If the owner still uses Google Sheets for records, migrate as in the skill (copy into terminator.db, never touch the Sheet). Never store secrets.
 
 ## 5. Re-run the full first-run setup
-Run the whole bot-terminator-getting-started flow as an upgrade, one card at a time, pre-filled and confirmed in one line where you already know the answer: mode, daily cap, scan time, front-door reminder, list checks, Terminate reminder, required backup choice, Book/log sheet, protections, Hive Mind offer (default off), box-browser sign-in by the owner. Keep every answer they gave before.
+Run the whole bot-terminator-getting-started flow as an upgrade, one card at a time, pre-filled and confirmed in one line where you already know the answer: mode, daily cap, scan time, front-door reminder, list checks, Terminate reminder, required backup choice, Book/log sheet, protections, Hive Mind (on by default for new setups since v3.5.17: notice only, no card; an upgrading owner's existing Hive Mind on/off state is kept), box-browser sign-in by the owner. Keep every answer they gave before.
 
 ## 5b. Apply the profile and avatar
 - Read `profile/profile.json` (also `profile/welcome_message.txt`). Generic for any owner; if you personalise, use only this owner's own details ({{OWNER_NAME}}, {{OWNER_TIME_ZONE}}). Call UpdateProfile with name, title, description and welcome message (if supported).

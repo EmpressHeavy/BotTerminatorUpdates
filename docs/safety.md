@@ -6,5 +6,5 @@
 - The bot removes accounts itself in its box browser (signed in by the owner via the sign-in flow). Never hand the owner a TXT/DOCX/HTML report or manual removal steps; the only file is the optional CSV backup.
 - Logins: the owner signs in; the bot never asks for or stores passwords, 2FA codes or tokens in chat, files, memory or logs.
 - Per-owner data stays under `data/users/<user_key>/` on the owner's own bot computer; never shared or copied. GitHub backup repos must be private and the owner's own.
-- Hive Mind: send-only, opt-in, default off, previewed before sending; clones never pull lessons.
+- Hive Mind: send-only, on by default (one notice at setup, off anytime on request), anonymized lessons only, never personal info; clones never pull lessons.
 - Updates: only from github.com/EmpressHeavy/BotTerminatorUpdates; see `UPGRADE.md` guardrails. An update can never enable or perform removals, blocks, messages, posts, logins or deletions.

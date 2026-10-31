@@ -5,6 +5,7 @@ Setting 2 covers returnees AND the list checks (on/off, default off).
 Settings 6-7 (pacing, reminders and connectors) include the optional Terminate reminder (the bot's own daily chat
 nudge, on/off + time, default off) next to the front-door reminder; a companion line always shows both, kept apart.
 v3.5.0: a companion line shows the records backup (GitHub / cloud CSV / download / Sheets / not yet) for owners with a records section.
+v3.5.17: build_toggle_card lists every on/off setting (including Hive Mind) with its state; only picked ones flip.
 v3.3.0: a companion line shows the optional memory backup (on/off + private repo; default off), under 6-7.
 The card stays at 6 options: when setting 8 exists, it folds into the '6-8' button.
 """
@@ -62,3 +63,42 @@ def build(prior_cleanup: dict | None = None, lists_enabled: bool | None = None, 
     return {"intro": INTRO, "instruction": INSTRUCTION, "buttons": buttons, "settings": settings,
             "extra_companion_lines": [x for x in (line8, lists_line(lists_enabled), tr.status_line(cfg), mem.status_line(cfg),
                                                                          rec.status_line(cfg) if cfg and "records" in cfg else None) if x], "multi_select": True}
+
+
+# ---------- v3.5.17: every on/off setting (including Hive Mind) in one multi-select toggle card ----------
+TOGGLE_PROMPT = "Tap any setting you want to flip. Untapped settings stay as they are."
+
+
+def _on(v) -> str:
+    return "ON" if v else "OFF"
+
+
+def toggle_settings(cfg: dict | None = None, hive_enabled: bool | None = True) -> list[dict]:
+    """Each on/off setting with its current state. Only what the owner picks is flipped."""
+    cfg = cfg or {}
+    rows = [("list_checks", "List checks", bool((cfg.get("lists") or {}).get("enabled"))),
+            ("front_door_reminder", "Front-door reminder", bool((cfg.get("daily_scan") or {}).get("reminder_via_front_door"))),
+            ("terminate_reminder", "Terminate reminder", bool(tr.section(cfg)["enabled"])),
+            ("memory_backup", "Memory backup", bool(mem.section(cfg)["backup"]["enabled"])),
+            ("hive_mind", "Hive Mind", bool(hive_enabled))]
+    return [{"key": k, "label": f"{name}: {_on(v)}", "state": v} for k, name, v in rows]
+
+
+def build_toggle_card(cfg: dict | None = None, hive_enabled: bool | None = True) -> dict:
+    try:
+        from . import hive_setup as hs
+    except ImportError:  # pragma: no cover
+        import hive_setup as hs
+    opts = toggle_settings(cfg, hive_enabled)
+    return {"prompt": TOGGLE_PROMPT, "options": [o["label"] for o in opts], "keys": [o["key"] for o in opts],
+            "states": {o["key"]: o["state"] for o in opts}, "multi_select": True,
+            "companion_lines": [hs.status_line(hive_enabled)]}
+
+
+def apply_toggles(card: dict, picked: list[str]) -> dict:
+    """Return {key: new_state} for picked options only (by label or key)."""
+    out = {}
+    for lab, key in zip(card["options"], card["keys"]):
+        if lab in picked or key in picked:
+            out[key] = not card["states"][key]
+    return out

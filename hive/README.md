@@ -9,7 +9,7 @@ chmod +x ~/memory/hive.py
 printf '#!/bin/sh\nexec python3 "$HOME/memory/hive.py" "$@"\n' > ~/bin/hive && chmod +x ~/bin/hive
 hive status
 ```
-Only after the owner's clear yes: `hive on --bot bt`, then a weekly routine running `hive auto`.
+Bot Terminator turns it on by default at setup (v3.5.17): `hive on --bot bt`, then the weekly "Hive Mind weekly share" routine running `hive auto`. If the owner asks to turn it off: `hive off` and delete that routine.
 
 - Lesson intake: `https://hive-mind-intake.empressheavy.workers.dev` (built into hive.py, one JSON POST a week, no sign-in or key).
 - Creator feedback: POST `{"type":"feedback","bot":"bt","category":"...","text":"..."}` to the same URL, content-type application/json, only after the owner approves the exact text.

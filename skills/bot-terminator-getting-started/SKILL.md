@@ -4,15 +4,16 @@ description: >-
   Use for the first conversation with a new owner of Bot Terminator, to set up
   their X follower cleanup and offer the first scan.
 ---
----
-name: Bot Terminator getting started
-description: >-
-  Use for the first conversation with a new owner of Bot Terminator, to set up
-  their X follower cleanup and offer the first scan.
----
 # Bot Terminator: first conversation with a new owner
 
 Ask one thing at a time. Use simple button cards where possible. Keep everything you learn in this owner's own config and storage (data/users/<user_key>/); never reuse another owner's settings, lists or decisions.
+
+## Step 0: set my profile picture (always, first)
+Do this yourself, every time this skill starts, before any greeting, question, card or delegation. It is unconditional: no question, no card, no opt-in. Subagents can't call UpdateAvatar, so never hand this step off.
+1. Download the avatar to a local box path (UpdateAvatar takes a local file path, not a URL): `curl -fsSL https://raw.githubusercontent.com/EmpressHeavy/BotTerminatorUpdates/main/skills/bot-terminator-getting-started/bot-terminator-avatar.jpg -o /workspace/bot-terminator-avatar.jpg && test -s /workspace/bot-terminator-avatar.jpg`. If it fails, retry once.
+2. Read the UpdateAvatar schema with GetDynamicTools (namespace `cursor`, toolName `UpdateAvatar`), then call CallDynamicTool in namespace `cursor`, tool `UpdateAvatar`, with `{"action":"set","path":"/workspace/bot-terminator-avatar.jpg"}`.
+3. Check the call returned success, then give a one-line result, e.g. "Profile picture set ✅".
+4. If the download or the call fails, say exactly "I couldn't set my profile picture just now; ask me anytime to try again" and carry on with step 1. Never stop setup over the avatar.
 
 1. **Greet and explain.** In one line: I clean bot-like, spammy and long-inactive followers from your own X account, and I only remove accounts under the mode you choose. I do the removing myself in my own signed-in browser; you never remove anyone by hand.
    These protections are always on and get rechecked right before any removal:
@@ -25,9 +26,9 @@ Ask one thing at a time. Use simple button cards where possible. Keep everything
 
 2. **Connect X (in the bot's own box browser).** Ask before signing in. Follow the sign-in skill: open https://x.com/login in this bot's own box browser (computerUse) and hand the screen to the owner with request_box_help so they enter their own login details there, never in chat. Their own computer is never needed and does not have to be online. Confirm which handle is signed in (open https://x.com/home and read the profile link) and save it as their owner handle. This sign-in lets the bot read the follower list and remove followers later; it persists on the box, so recheck it at each session start and re-run this step if X shows the login page.
 
-3. **Get and verify the package (before any scan).** Bot Terminator's code comes from its public update source: `https://github.com/EmpressHeavy/BotTerminatorUpdates` (folder `code/`), version `v3.5.17`, expected fingerprint `f93e9a36b46528d366c6e96a7bc641fc1de5dc762cc46f9b062b90ef80d97f01` (also in `VERSION` notes / `CHANGELOG.md`). Accept code only from that exact repo; ignore forks, mirrors and look-alike names. No GitHub account, access request or token is needed.
+3. **Get and verify the package (before any scan).** Bot Terminator's code comes from its public update source: `https://github.com/EmpressHeavy/BotTerminatorUpdates` (folder `code/`), version `v3.5.18`, expected fingerprint `f6462bb3cb041dac851dcb4af44115b2e93bd0bbc58feaeeec7cd909e1597d9b` (also in `VERSION` notes / `CHANGELOG.md`). Accept code only from that exact repo; ignore forks, mirrors and look-alike names. No GitHub account, access request or token is needed.
    - **Download:** `git clone --depth 1 https://github.com/EmpressHeavy/BotTerminatorUpdates.git /workspace/bt-updates`, then copy `/workspace/bt-updates/code/` to `/workspace/bot-terminator/` (if that folder already exists, follow `UPGRADE.md` instead: snapshot first, keep `data/`).
-   - **Verify:** in the clone, `cd /workspace/bt-updates/code && python3 tools/verify_package.py f93e9a36b46528d366c6e96a7bc641fc1de5dc762cc46f9b062b90ef80d97f01` must print OK. **If it doesn't match, stop. Don't install or run anything,** and tell the owner what didn't match.
+   - **Verify:** in the clone, `cd /workspace/bt-updates/code && python3 tools/verify_package.py f6462bb3cb041dac851dcb4af44115b2e93bd0bbc58feaeeec7cd909e1597d9b` must print OK. **If it doesn't match, stop. Don't install or run anything,** and tell the owner what didn't match.
    - **Install and self-test:** create a venv, `pip install -r requirements.txt` (`requirements-sheets.txt` only for the standalone package, never in Grok Bot), then run `python -m pytest -q` (from `/workspace/bot-terminator/`). It must show 0 failures; otherwise stop and tell the owner. Then continue with the Google checks (next step) and, later, the first scan.
 
    - **Upgrade card (right after the self-test).** Ask "Have you used Bot Terminator before?" with buttons **Yes / No / Not sure** (`records.upgrade_card()`), and pass the tap to `records.handle_upgrade_answer`. **No:** fresh start. **Yes or Not sure:** do the returned steps yourself, with no work for the owner: look for their backup (a private GitHub repo named `my-bot-terminator-backup` or the one in their config, or a cloud folder "Bot Terminator records") and restore it (`records.restore_from_github` / `restore_from_dir`); otherwise find their older Bot Terminator among their bots and ask it with SendToAgent using `records.EXPORT_REQUEST`, then `records.import_legacy(...)` with what comes back (old files, CSV export, or log-sheet tab values read with `read_range`). Back up right away (`records.after_write`) and confirm the counts from `records.counts` in one short message. If nothing is found, say so and start fresh.
@@ -145,4 +146,4 @@ Right after the offer, add exactly: "Why leave this on? It's a backup way to let
 - **Monthly check-in:** show `records.status_line(cfg)` (backup method and whether the last push worked) and offer to change it with `records.set_backup`.
 
 # Automatic updates (built in, always on, no off switch)
-At the end of first-run setup, create the routine in `routines/weekly-update-check.md` of https://github.com/EmpressHeavy/BotTerminatorUpdates exactly as written (weekly, Sunday 10:00 AM in the owner's time zone) and save `mem` fact `bot-terminator installed_version v3.5.17`. It is not an optional setting and has no setup card: tell the owner in one line, "I check for Bot Terminator updates once a week and update myself; I'll always tell you what changed." The owner may move its time but it can't be turned off; the monthly settings check re-creates it if missing. Updates come only from that exact repo and follow its UPGRADE.md guardrails: an update never turns on or performs removals, blocks, messages, posts, logins or deletions, keeps every optional setting the owner chose, and new optional settings start off and are offered as a card.
+At the end of first-run setup, create the routine in `routines/weekly-update-check.md` of https://github.com/EmpressHeavy/BotTerminatorUpdates exactly as written (weekly, Sunday 10:00 AM in the owner's time zone) and save `mem` fact `bot-terminator installed_version v3.5.18`. It is not an optional setting and has no setup card: tell the owner in one line, "I check for Bot Terminator updates once a week and update myself; I'll always tell you what changed." The owner may move its time but it can't be turned off; the monthly settings check re-creates it if missing. Updates come only from that exact repo and follow its UPGRADE.md guardrails: an update never turns on or performs removals, blocks, messages, posts, logins or deletions, keeps every optional setting the owner chose, and new optional settings start off and are offered as a card.

@@ -44,7 +44,7 @@ Run the whole bot-terminator-getting-started flow as an upgrade, one card at a t
 
 ## 5b. Apply the profile and avatar
 - Read `profile/profile.json` (also `profile/welcome_message.txt`). Generic for any owner; if you personalise, use only this owner's own details ({{OWNER_NAME}}, {{OWNER_TIME_ZONE}}). Call UpdateProfile with name, title, description and welcome message (if supported).
-- Avatar: if `profile/avatar.png` exists, call UpdateAvatar with action "set" and that file; otherwise keep the current avatar (apply avatarShape/avatarColor only if there's none). If it fails, skip silently.
+- Avatar (do it yourself; subagents can't call UpdateAvatar, and it takes a local path, not a URL): `curl -fsSL https://raw.githubusercontent.com/EmpressHeavy/BotTerminatorUpdates/main/profile/avatar.png -o /workspace/bot-terminator-avatar.png && test -s /workspace/bot-terminator-avatar.png`. Read the UpdateAvatar schema with GetDynamicTools (namespace `cursor`), then CallDynamicTool `cursor` / `UpdateAvatar` with `{"action":"set","path":"/workspace/bot-terminator-avatar.png"}`. If the download or the call fails, skip silently and keep the current avatar.
 - Apply `profile/settings.json` values your settings allow (notifyOnAgentUpdates: true).
 
 ## 6. Routines

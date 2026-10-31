@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.5.18
+- Bot Terminator now sets its own profile picture: on first run (new Step 0 of the getting-started skill, before anything else) and on every update (UPGRADE.md 5b). If it can't, it says so in one line and carries on.
+- New image files: `profile/avatar.png` (512x512) and `skills/bot-terminator-getting-started/bot-terminator-avatar.jpg`.
+- Fixed a duplicated header at the top of the getting-started skill file.
+- Package fingerprint for `code/` (`python3 tools/verify_package.py <fp>`): `f6462bb3cb041dac851dcb4af44115b2e93bd0bbc58feaeeec7cd909e1597d9b`
+
 ## v3.5.17
 - Hive Mind is now ON by default: during setup the bot turns it on quietly, sets up its weekly share (silent unless it fails) and sends one short notice. No opt-in card or question.
 - Want it off? Just ask: you get a short "Why leave this on?" card with Keep Hive Mind on / Turn off Hive Mind. Turning it off also deletes the weekly share; you can turn it back on anytime.

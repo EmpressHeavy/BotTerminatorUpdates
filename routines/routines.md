@@ -6,7 +6,7 @@ All times are in the owner's own time zone ({{OWNER_TIME_ZONE}}). Exact prompts:
 |---|---|---|---|---|
 | 1 | Daily scan | daily at the owner's scan time (setup card, `new_user.SETUP_QUESTIONS`) | setup step 8 | on (owner picks time) |
 | 2 | Inactive mutuals card | daily, with the scan | setup | on (card only; nothing removed unless marked) |
-| 3 | Terminate reminder ("Hey, want to terminate some bots?") | daily at the owner's chosen time; one-off "Remind me later" follow-ups | setup / monthly check-in via `terminate_reminder.set_reminder` | **off** |
+| 3 | Terminate reminder ("Hey, want to terminate some bots?") | daily or weekly (chosen weekday) at the owner's chosen time; one-off "Remind me later" follow-ups | setup cadence cards / monthly check-in via `terminate_reminder.set_reminder` | **off** |
 | 4 | List returns check | daily, only if list checks are on | setup | **off** |
 | 5 | Weekly backup file | weekly, only if backup = "Send me the file" (`records.download_reminder`, sends only when something changed) | setup backup card | owner's backup choice |
 | 6 | Backup re-ask | each session start while backup is `pending` (`records.backup_reminder`) | setup | until a backup is chosen |

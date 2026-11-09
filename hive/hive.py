@@ -8,24 +8,47 @@ ONLY that one item as a `direct` single-item payload, with its own small allowan
 from the weekly/urgent batches), so a reworded retry after HTTP 422 can go right away. Dry run prints the exact bytes.
 v3.5.16 (update-repo copy): SEND-side only; the lesson `import` command is removed, clones never pull lessons.
 v3.5.13: template version bump only (verified hard pre-filter).
-v3.5.12: template version bump only (the review tool fix is in tools/hive_review.py)."""
+v3.5.12: template version bump only (the review tool fix is in tools/hive_review.py).
+v3.5.20: kind `capability` (alias `self_upgrade`) for an owner-taught method this copy has that the shipped build does not.
+Eligible after 1 use, same scrub, not urgent (only `broken` is). Weekly batches skip hashes already in hive_sent_h, and a
+successful send marks those rows shared so they leave the weekly pool. Template version is read from the package VERSION
+file (fallback below, kept in lockstep by tests)."""
 import sqlite3, sys, os, re, json, hashlib, secrets, datetime, urllib.request, urllib.error
 DB = os.environ.get('MEM_DB', os.path.expanduser('~/memory/brain.db'))
 URL = 'https://hive-mind-intake.empressheavy.workers.dev'
-TV = 'v3.5.18'
+_FALLBACK_TV = 'v3.5.20'
+_VER_RX = re.compile(r'^v\d+(?:\.\d+){1,3}$')
+def read_template_version():
+    """Package VERSION (first line), else the fallback. Installed copies also read ~/memory/VERSION."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    candidates = []
+    envf = os.environ.get('BT_VERSION_FILE')
+    if envf: candidates.append(envf)
+    if os.path.basename(here) == 'hive': candidates.append(os.path.join(here, '..', 'VERSION'))
+    candidates.append('/workspace/bot-terminator/VERSION')
+    candidates.append(os.path.join(here, 'VERSION'))
+    for p in candidates:
+        try: line = open(p, encoding='utf-8').read().strip().splitlines()[0].strip()
+        except (OSError, IndexError): continue
+        if _VER_RX.match(line): return line
+    return _FALLBACK_TV
+TV = read_template_version()
 CODES = {'dg': 'DOGE', 'bt': 'Bot Terminator', 'pc': 'Playlist Converter'}
 N2C = {v.lower(): k for k, v in CODES.items()}
-KINDS = ('lesson', 'correction', 'request', 'declined', 'broken', 'workaround')
+KINDS = ('lesson', 'correction', 'request', 'declined', 'broken', 'workaround', 'capability')
+KIND_ALIASES = {'self_upgrade': 'capability'}  # client only; the intake kind is capability
 FB_CATS = {'bug': 'broken', 'request': 'request', 'praise': 'praise', 'other': 'other'}  # category -> intake kind
 DPD = 3  # direct one-shot feedback: accepted sends per UTC day (intake enforces the same)
 CAP, FLEN, MAXB, UCAP = 20, 150, 8192, 5
-SCHEMA = """CREATE TABLE IF NOT EXISTS lesson(id INTEGER PRIMARY KEY,topic TEXT,wrong TEXT,right TEXT,uses INTEGER DEFAULT 1,src TEXT DEFAULT 'local',status TEXT DEFAULT 'current',added TEXT,last TEXT,kind TEXT DEFAULT 'lesson');
+SCHEMA = """CREATE TABLE IF NOT EXISTS lesson(id INTEGER PRIMARY KEY,topic TEXT,wrong TEXT,right TEXT,uses INTEGER DEFAULT 1,src TEXT DEFAULT 'local',status TEXT DEFAULT 'current',added TEXT,last TEXT,kind TEXT DEFAULT 'lesson',shared INTEGER DEFAULT 0);
 CREATE TABLE IF NOT EXISTS hive_state(k TEXT PRIMARY KEY,v TEXT);
 CREATE TABLE IF NOT EXISTS hive_sent(id INTEGER PRIMARY KEY,wk TEXT,sent_at TEXT,lines INTEGER,status TEXT,body TEXT);
 CREATE TABLE IF NOT EXISTS hive_sent_h(h TEXT PRIMARY KEY,sent_at TEXT);"""
 def con():
     c = sqlite3.connect(DB, isolation_level=None); c.execute('PRAGMA busy_timeout=30000'); c.executescript(SCHEMA)
-    if 'kind' not in [r[1] for r in c.execute('PRAGMA table_info(lesson)')]: c.execute("ALTER TABLE lesson ADD COLUMN kind TEXT DEFAULT 'lesson'")
+    cols = [r[1] for r in c.execute('PRAGMA table_info(lesson)')]
+    if 'kind' not in cols: c.execute("ALTER TABLE lesson ADD COLUMN kind TEXT DEFAULT 'lesson'")
+    if 'shared' not in cols: c.execute('ALTER TABLE lesson ADD COLUMN shared INTEGER DEFAULT 0')
     return c
 def get(c, k, d=None):
     r = c.execute('SELECT v FROM hive_state WHERE k=?', (k,)).fetchone(); return r[0] if r else d
@@ -68,19 +91,24 @@ def clean(s, ns):
     for n in ns: s = re.sub(r'(?<![\w<])' + re.escape(n) + r'(?![\w>])', '<NAME>', s, flags=re.I)
     if RISKY.search(s) or INTAKE.search(s): return None
     return s[:FLEN]
+def canon_kind(k):
+    k = KIND_ALIASES.get(k or '', k or '')
+    return k if k in KINDS else 'lesson'
 def build(c, urgent=False):
     b = get(c, 'bot'); ns = names(c); r_ = rid(c); w_ = wk(); out, seen, drop = [], set(), 0
-    q = ("SELECT kind,topic,wrong,right,uses FROM lesson WHERE status='current' AND src<>'hive' AND "
+    sent_h = {row[0] for row in c.execute('SELECT h FROM hive_sent_h')}
+    # shared=1 rows already left the weekly pool (marked after a successful send)
+    q = ("SELECT kind,topic,wrong,right,uses FROM lesson WHERE status='current' AND src<>'hive' AND COALESCE(shared,0)=0 AND "
          "((COALESCE(kind,'lesson')='lesson' AND uses>=2) OR (COALESCE(kind,'lesson')<>'lesson' AND uses>=1)) "
          "ORDER BY kind='broken' DESC, COALESCE(kind,'lesson')<>'lesson' DESC, uses DESC, id DESC")
     for k, t, w, r, u in c.execute(q).fetchall():
-        k = k if k in KINDS else 'lesson'
-        if urgent and k != 'broken': continue
+        k = canon_kind(k)
+        if urgent and k != 'broken': continue  # capability is weekly-only unless the owner also records broken
         t2, w2, r2 = clean(t or 'general', ns), clean(w, ns), clean(r, ns)
         if None in (t2, w2, r2): drop += 1; continue
         d = {'v': 2, 'b': b, 'k': k, 't': t2, 'w': w2, 'r': r2, 'n': bucket(u), 'tv': TV, 'rid': r_, 'h': hsh(b, k, t2, w2, r2), 'wk': w_}
         if d['h'] in seen: drop += 1; continue
-        if urgent and c.execute('SELECT 1 FROM hive_sent_h WHERE h=?', (d['h'],)).fetchone(): continue
+        if d['h'] in sent_h: continue  # weekly and urgent: a hash sent in an earlier ISO week is not sent again
         trial = out + [d]
         if len(json.dumps({'batch': trial}, separators=(',', ':')).encode()) > MAXB: break
         seen.add(d['h']); out = trial
@@ -105,7 +133,18 @@ def send(c, recs, urgent=False):
     else: put(c, 'last_sent_wk', wk())  # one weekly attempt, accepted or not; never retried another way
     if code == 200:
         for d in recs: c.execute('INSERT OR IGNORE INTO hive_sent_h(h,sent_at) VALUES(?,?)', (d['h'], now()))
+        mark_shared(c, recs)
     print('sent %d line(s): HTTP %s' % (len(recs), code) if code == 200 else 'not sent: HTTP %s %s' % (code, msg))
+def mark_shared(c, recs):
+    """Fully-sent rows leave the weekly pool. Local lessons stay status=current so the bot can still read them."""
+    hs = {d['h'] for d in recs}
+    if not hs: return
+    b, ns = get(c, 'bot'), names(c)
+    for i, k, t, w, r in c.execute("SELECT id,kind,topic,wrong,right FROM lesson WHERE COALESCE(shared,0)=0"):
+        k = canon_kind(k)
+        t2, w2, r2 = clean(t or 'general', ns), clean(w, ns), clean(r, ns)
+        if None in (t2, w2, r2): continue
+        if hsh(b, k, t2, w2, r2) in hs: c.execute('UPDATE lesson SET shared=1 WHERE id=?', (i,))
 def auto(c, dry):
     ok = get(c, 'enabled') == '1' and get(c, 'bot') in CODES
     if dry:  # offline: build exactly what would go out, log it as dry-run, no network, no state change
@@ -157,12 +196,16 @@ def direct(c, a):
         c.execute('INSERT OR IGNORE INTO hive_sent_h(h,sent_at) VALUES(?,?)', (d['h'], now())); print('sent 1 line: HTTP 200'); return
     print('not sent: HTTP %s %s' % (code, msg) + ('; reword without private details and retry' if code == 422 else '')); sys.exit(2)
 FB_USAGE = 'feedback --bot dg|bt|pc --category bug|request|praise|other "text" [--dry-run]'
-USAGE = ('hive lesson add TOPIC WRONG RIGHT | feedback add correction|request|declined|broken|workaround TOPIC WHAT_I_DID_OR_OFFERED WHAT_OWNER_WANTED'
+USAGE = ('hive lesson add TOPIC WRONG RIGHT | feedback add correction|request|declined|broken|workaround|capability TOPIC WHAT_SHIPPED_DID WHAT_IS_NOW_TRUE'
+         ' (self_upgrade is an alias of capability)'
          ' | ' + FB_USAGE + ' | on --bot dg|bt|pc | off | status | preview | auto [--dry-run] | shared [N]')
 def main(a):
     c = con(); cmd = a[0] if a else ''
     if cmd == 'lesson' and len(a) >= 5 and a[1] == 'add': add(c, 'lesson', *a[2:5])
-    elif cmd == 'feedback' and len(a) >= 6 and a[1] == 'add' and a[2] in KINDS[1:]: add(c, a[2], *a[3:6])
+    elif cmd == 'feedback' and a[1:2] == ['add']:
+        k = KIND_ALIASES.get(a[2], a[2]) if len(a) >= 6 else ''
+        if k in KINDS[1:]: add(c, k, *a[3:6])
+        else: sys.exit(USAGE)
     elif cmd == 'feedback' and a[1:2] != ['add']: direct(c, a[1:])
     elif cmd == 'on':
         b = a[a.index('--bot') + 1] if '--bot' in a else get(c, 'bot'); b = N2C.get((b or '').lower(), b)

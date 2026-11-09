@@ -1,5 +1,18 @@
 # Changelog
 
+## v3.5.20
+- Hive Mind records owner-taught capabilities: when an owner teaches this copy a method, skill, routine, storage, or workflow the shipped build does not have, the bot records kind `capability` (`self_upgrade` is an alias) with personal details removed, and includes it in that week's batch under its own heading.
+- Weekly Hive Mind batches skip any hash already sent, so the same correction is not resent every week. A successful send marks those rows shared so they leave the weekly pool.
+- Template version is read from the package `VERSION` file (fallback `v3.5.20`), so Hive Mind reports match the release.
+- Every upgrade reinstalls the Hive Mind client (`sh tools/install_hive.sh`); it only copies files and does not change Hive Mind on/off.
+- Package fingerprint for `code/` (`python3 tools/verify_package.py <fp>`): `899ef9936b234c35e92b921dd7ad5477478ed33fc54150052d1ee90b1b314a04`
+
+## v3.5.19
+- Terminate reminder setup uses cadence cards before a routine is created (still optional, off by default). Prompt: "How often do you want me to remind you to terminate bots?" with Daily / Weekly (Monday–Thursday) / More days; More days offers Friday–Sunday or No, not now. Daily or any weekly day then asks for a time.
+- Owners who already have a terminate-reminder schedule are not asked again; a missing `cadence` is treated as daily.
+- Status, Book change lines, and the monthly check-in say `daily at HH:MM` or `weekly (Monday) at HH:MM`.
+- Package fingerprint for `code/` (`python3 tools/verify_package.py <fp>`): `25bf68c3a8c817657421d307bb2de72526b63b7a63532009e3bb49048e97bc03`
+
 ## v3.5.18
 - Bot Terminator now sets its own profile picture: on first run (new Step 0 of the getting-started skill, before anything else) and on every update (UPGRADE.md 5b). If it can't, it says so in one line and carries on.
 - New image files: `profile/avatar.png` (512x512) and `skills/bot-terminator-getting-started/bot-terminator-avatar.jpg`.

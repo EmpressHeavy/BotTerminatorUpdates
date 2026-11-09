@@ -9,9 +9,10 @@
 2. Read the installed version from memory (`mem` fact `bot-terminator installed_version`), else `TEMPLATE_VERSION` in `/workspace/bot-terminator/src/feedback.py`.
 3. Versions look like `v3.5.16`. Strip the leading `v` and compare the dot-separated parts as integers (3.5.16 > 3.5.9). If the remote value doesn't match `v<int>.<int>.<int>`, or is ≤ installed: stay silent and stop.
 4. If remote > installed: **apply the update automatically, no owner yes needed**, by following UPGRADE.md from this repo in "Automatic update" mode (its section A):
-   - snapshot first (terminator.db, memory, config, Graveyard, Always Keep, skills, routine list) and back up to the owner's chosen backup;
-   - keep all owner data and settings;
+   - snapshot first (terminator.db, memory, config, Graveyard, Always Keep, skills, routine list, `~/memory/hive.py`, `~/memory/VERSION`, `~/bin/hive`) and back up to the owner's chosen backup;
+   - keep all owner data and settings, including Hive Mind on/off;
    - verify the package fingerprint given in the new getting-started skill; on mismatch, stop;
+   - after the new code is in place, refresh the Hive Mind client with `sh tools/install_hive.sh` (copy only; does not turn Hive Mind on or off);
    - roll back to the snapshot if any step fails.
 5. When done, send the owner ONE short note: "Bot Terminator updated to v<remote> 🤖 Here's what's new: <2–4 bullets from that version's CHANGELOG.md entry>". If the update brought a new optional setting, add it as a tap-button card that is off unless they say yes.
 6. If the update failed and was rolled back, say so in one line ("Tried to update to v<remote>, rolled back, everything is as it was"), record a `hive lesson` if Hive Mind is on, and try again next week.

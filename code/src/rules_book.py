@@ -25,6 +25,15 @@ def render(cfg: dict, root=None, *, today: str | None = None) -> str:
     scan = cfg.get("daily_scan") or {}
     tr = cfg.get("terminate_reminder") or {}
     prot = ", ".join("@" + h.lstrip("@") for h in cfg.get("protected_handles") or []) or "none yet"
+    if tr.get("enabled"):
+        try:
+            from . import terminate_reminder as trm
+        except ImportError:  # pragma: no cover
+            import terminate_reminder as trm
+        tz = tr.get("tz") or cfg.get("time_zone") or "America/Los_Angeles"
+        tr_text = "on, " + trm.describe(tr, tz)  # "daily at HH:MM" or "weekly (Monday) at HH:MM"; missing cadence is daily
+    else:
+        tr_text = "off"
     return tpl.format(handle=cfg.get("owner_x_handle") or "your account", protected=prot,
                       mutuals_per_day=cfg.get("inactive_mutuals_per_day", 3),
                       daily_cap=cfg.get("daily_removal_cap", 10),
@@ -32,8 +41,7 @@ def render(cfg: dict, root=None, *, today: str | None = None) -> str:
                       scan_time=scan.get("time") or "not set", time_zone=cfg.get("time_zone") or "local time",
                       lists="on" if (cfg.get("lists") or {}).get("enabled") else "off",
                       reminder="on" if scan.get("reminder_via_front_door") else "off",
-                      terminate_reminder=(f"on, daily at {tr['time']} ({tr.get('tz') or cfg.get('time_zone') or 'America/Los_Angeles'})"
-                                          if tr.get("enabled") else "off"),
+                      terminate_reminder=tr_text,
                       memory_backup=(f"on, private repo {mb['repo']}" if (mb := ((cfg.get('memory') or {}).get('backup') or {})).get('enabled') else "off"),
                       date=today or dt.date.today().isoformat())
 

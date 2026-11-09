@@ -77,19 +77,22 @@ def test_off_by_default_and_no_routine(tmp_path):
     p = make(tmp_path, "demo_off")
     c = json.loads(p.read_text())
     assert c["terminate_reminder"]["enabled"] is False and c["terminate_reminder"]["time"] is None
+    assert c["terminate_reminder"]["cadence"] == "daily" and c["terminate_reminder"]["weekday"] is None
     assert not tr.enabled(c) and tr.routine_spec(c) is None
     assert new_user.setup_plans(c, tmp_path)["terminate_reminder"] is None
-    assert json.loads((ROOT / "config/default_user_config.json").read_text())["terminate_reminder"]["enabled"] is False
+    defaults = json.loads((ROOT / "config/default_user_config.json").read_text())["terminate_reminder"]
+    assert defaults["enabled"] is False and defaults["cadence"] == "daily" and defaults["weekday"] is None
     assert tr.build_prompt("demo_off", tmp_path, now=at(18))["send"] is False
 
 
-def test_setup_asks_yes_no_and_time_and_keeps_front_door_separate():
+def test_setup_asks_cadence_then_time_and_keeps_front_door_separate():
     q = new_user.SETUP_QUESTIONS
-    assert any("terminate some bots" in x and "default: no" in x for x in q)
-    assert any(x.startswith("What time should I send it?") for x in q)
+    assert tr.SETUP_QUESTION == "How often do you want me to remind you to terminate bots?"
+    i = q.index(tr.SETUP_QUESTION)
+    assert q[i + 1] == tr.SETUP_TIME_QUESTION and tr.SETUP_TIME_QUESTION.startswith("What time should I send it?")
+    assert i < q.index(tr.SETUP_TIME_QUESTION)
     front = [x for x in q if "front-door" in x and x.startswith("Want a reminder")][0]
     assert "separate from the chat nudge" in front
-    assert "separate from the front-door reminder" in tr.SETUP_QUESTION
     assert "default: no" in q[3]     # list question unchanged at index 3
 
 
@@ -359,10 +362,10 @@ def test_turn_on_off_and_change_time(tmp_path):
 def test_monthly_card_shows_it_with_both_reminders_kept_apart(root):
     off = mc.build(None)
     line = [x for x in off["extra_companion_lines"] if "Terminate reminder" in x][0]
-    assert "OFF (default)" in line and "front-door reminder, which is OFF" in line and "turn it on and pick a daily time" in line
+    assert "OFF (default)" in line and "front-door reminder, which is OFF" in line and "turn it on and pick how often and a time" in line
     on = mc.build(None, cfg=cfg(root))
     line = [x for x in on["extra_companion_lines"] if "Terminate reminder" in x][0]
-    assert "ON, daily at 18:00 (America/Los_Angeles)" in line and "change the time or turn it off" in line
+    assert "ON, daily at 18:00 (America/Los_Angeles)" in line and "change how often, the time, or turn it off" in line
     c = cfg(root); c["daily_scan"]["reminder_via_front_door"] = True
     assert "front-door reminder, which is ON" in tr.status_line(c)
     assert "reminders" in on["buttons"][4] and len(on["buttons"]) <= mc.MAX_OPTIONS
@@ -410,8 +413,127 @@ def test_state_lives_in_the_users_own_folder(root):
     assert other == []
 
 
+# ---------- v3.5.19 cadence cards ----------
+def test_cadence_cards_are_exact_and_have_no_free_text():
+    first = tr.cadence_card()
+    assert first["prompt"] == "How often do you want me to remind you to terminate bots?"
+    assert first["allowCustom"] is False and first["multiSelect"] is False
+    assert [o["label"] for o in first["options"]] == [
+        "Daily", "Weekly (Monday)", "Weekly (Tuesday)", "Weekly (Wednesday)", "Weekly (Thursday)", "More days"]
+    assert len(first["options"]) <= 6
+    more = tr.cadence_more_card()
+    assert more["prompt"] == "Which day should I remind you?"
+    assert more["allowCustom"] is False and more["multiSelect"] is False
+    assert [o["label"] for o in more["options"]] == [
+        "Weekly (Friday)", "Weekly (Saturday)", "Weekly (Sunday)", "No, not now"]
+    assert len(more["options"]) <= 6
+
+
+@pytest.mark.parametrize("text,action,cadence,dow", [
+    ("daily", "schedule", "daily", None),
+    ("Daily", "schedule", "daily", None),
+    ("weekly monday", "schedule", "weekly", 1),
+    ("Weekly (Monday)", "schedule", "weekly", 1),
+    ("weekly (friday)", "schedule", "weekly", 5),
+    ("Weekly (Sunday)", "schedule", "weekly", 0),
+    ("weekly sunday", "schedule", "weekly", 0),
+    ("every Saturday", "schedule", "weekly", 6),
+])
+def test_parse_cadence_schedule(text, action, cadence, dow):
+    got = tr.parse_cadence_answer(text)
+    assert got["action"] == action and got["cadence"] == cadence and got["weekday"] == dow and got["enabled"] is True
+
+
+@pytest.mark.parametrize("text", ["More days", "more days", "more"])
+def test_parse_cadence_more_days(text):
+    assert tr.parse_cadence_answer(text) == {"action": "more"}
+
+
+@pytest.mark.parametrize("text", ["No, not now", "no", "not now", "skip", "NO"])
+def test_parse_cadence_off_does_not_schedule(text):
+    got = tr.parse_cadence_answer(text)
+    assert got["action"] == "off" and got["enabled"] is False
+    assert "cadence" not in got and "weekday" not in got
+
+
+def test_parse_cadence_rejects_unknown():
+    with pytest.raises(ValueError):
+        tr.parse_cadence_answer("weekly")
+    with pytest.raises(ValueError):
+        tr.parse_cadence_answer("banana")
+
+
+def test_weekly_and_daily_cron_and_sunday_monday_dow():
+    daily = {"terminate_reminder": {"enabled": True, "time": "18:00", "cadence": "daily", "weekday": None},
+             "time_zone": "America/Los_Angeles"}
+    assert tr.routine_spec(daily)["cron"] == "0 18 * * *"
+    monday = {"terminate_reminder": {"enabled": True, "time": "18:30", "cadence": "weekly", "weekday": 1},
+              "time_zone": "America/Los_Angeles"}
+    spec = tr.routine_spec(monday)
+    assert spec["cron"] == "30 18 * * 1" and spec["weekday"] == 1 and spec["cadence"] == "weekly"
+    sunday = {"terminate_reminder": {"enabled": True, "time": "09:05", "cadence": "weekly", "weekday": 0},
+              "time_zone": "America/Los_Angeles"}
+    assert tr.routine_spec(sunday)["cron"] == "5 9 * * 0" and tr.routine_spec(sunday)["weekday"] == 0
+    assert tr.weekly_label(0) == "Weekly (Sunday)" and tr.weekly_label(1) == "Weekly (Monday)"
+
+
+def test_missing_cadence_stays_daily():
+    old = {"terminate_reminder": {"enabled": True, "time": "18:00"}, "time_zone": "America/Los_Angeles"}
+    spec = tr.routine_spec(old)
+    assert spec["cron"] == "0 18 * * *" and spec["cadence"] == "daily" and spec["weekday"] is None
+    assert "daily at 18:00 (America/Los_Angeles)" in tr.status_line(old)
+    assert "weekly" not in tr.status_line(old)
+
+
+def test_create_user_writes_weekly_schedule(tmp_path):
+    (tmp_path / "config").mkdir(); (tmp_path / "templates").mkdir()
+    for f in ("config/default_user_config.json", "templates/bot_terminator_book.md"):
+        (tmp_path / f).write_text((ROOT / f).read_text())
+    p = make(tmp_path, "demo_wk", terminate_reminder_on=True, terminate_reminder_time="18:00",
+             terminate_reminder_cadence="weekly", terminate_reminder_weekday=1)
+    c = json.loads(p.read_text())
+    assert c["terminate_reminder"]["enabled"] is True
+    assert c["terminate_reminder"]["cadence"] == "weekly" and c["terminate_reminder"]["weekday"] == 1
+    assert c["terminate_reminder"]["time"] == "18:00"
+    spec = new_user.setup_plans(c, tmp_path)["terminate_reminder"]
+    assert spec["cron"] == "0 18 * * 1" and spec["time_zone"] == "America/Los_Angeles"
+    book = rules_book.render(c, tmp_path, today="2026-10-23")
+    assert "on, weekly (Monday) at 18:00 (America/Los_Angeles)" in book
+    assert "weekly (Monday) at 18:00" in tr.status_line(c)
+    on = tr.set_reminder("demo_wk", True, "07:15", tmp_path, now=at(10), cadence="weekly", weekday=0)
+    assert on["routine"]["cron"] == "15 7 * * 0"
+    assert on["book_change"] == "Terminate reminder on, weekly (Sunday) at 07:15 (America/Los_Angeles)."
+    # switching back to daily clears the weekday and keeps the daily cron owners already rely on
+    back = tr.set_reminder("demo_wk", True, "07:15", tmp_path, now=at(10, 1), cadence="daily")
+    assert back["routine"]["cron"] == "15 7 * * *" and back["weekday"] is None
+    with pytest.raises(ValueError):
+        make(tmp_path, "demo_bad", terminate_reminder_on=True, terminate_reminder_time="18:00",
+             terminate_reminder_cadence="weekly")
+
+
+def test_weekly_not_today_waits_until_the_next_weekday(tmp_path):
+    (tmp_path / "config").mkdir(); (tmp_path / "templates").mkdir()
+    for f in ("config/default_user_config.json", "templates/bot_terminator_book.md"):
+        (tmp_path / f).write_text((ROOT / f).read_text())
+    # 2026-10-23 is a Friday. Weekly Monday 18:00 asks again the following Monday, not tomorrow.
+    make(tmp_path, "demo_mon", terminate_reminder_on=True, terminate_reminder_time="18:00",
+         terminate_reminder_cadence="weekly", terminate_reminder_weekday=1)
+    assert tr.build_prompt("demo_mon", tmp_path, now=at(18))["send"] is True
+    r = tr.handle_answer("demo_mon", "Not today", tmp_path, now=at(18, 1))
+    nxt = dt.datetime(2026, 10, 26, 18, 0, tzinfo=PT)  # Monday
+    assert r["next_prompt"] == nxt.isoformat()
+    assert r["message"] == "No problem, not today. I'll ask again next Monday at 6:00 PM."
+
+
 def test_docs_and_skill_text_mention_the_feature():
     readme = (ROOT / "README.md").read_text()
-    for x in ("Terminate reminder", "Hey, want to terminate some bots?", "Remind me later", "Not today", "terminate_reminder"):
+    skill = (ROOT / "docs/skills/bot-terminator-getting-started.md").read_text()
+    for x in ("Terminate reminder", "Hey, want to terminate some bots?", "Remind me later", "Not today", "terminate_reminder",
+              "How often do you want me to remind you to terminate bots?", "Weekly (Monday)", "weekly (Monday) at"):
         assert x in readme, x
     assert "front-door" in readme
+    assert "once-a-day nudge" not in readme.lower() and "once a day nudge" not in readme.lower()
+    for x in ("How often do you want me to remind you to terminate bots?", "Which day should I remind you?",
+              "Weekly (Monday)", "Weekly (Friday)", "Weekly (Sunday)", "No, not now", "More days",
+              "v3.5.19", "missing `cadence`"):
+        assert x in skill, x

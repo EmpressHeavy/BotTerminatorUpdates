@@ -250,6 +250,7 @@ location alone never counts. Cards show the available fields in the stats line. 
 ## Hive Mind client (v3.5.9)
 `hive/hive.py` is the opt-in Hive Mind lesson-sharing client, byte-identical to the one in the hive-mind skill.
 Install it with `sh tools/install_hive.sh` (writes `~/memory/hive.py` and a `~/bin/hive` wrapper; sends nothing).
+Every upgrade re-runs that script (or copies `hive/hive.py` to `~/memory/hive.py`) so the installed client matches the template. The copy does not change Hive Mind on/off.
 It stays off until the owner says yes (`hive on --bot bt`).
 
 ## Where your data lives
@@ -404,12 +405,19 @@ browser steps are in [`docs/list_runbook.md`](docs/list_runbook.md); `src/list_f
    owners are skipped.
 Browser adapter methods (adapter mode; step mode replays what the bot saw via `list_flow.ObservedAdapter`): `list_state(list)`, `owner_state(owner)`, `block(owner)`, `unblock(owner)`.
 
-## Terminate reminder (v3.2.0, optional; asked at setup, default off)
-A once-a-day nudge, sent by the bot itself in your chat (`src/terminate_reminder.py`), at a time you choose
-(config `terminate_reminder`: `enabled`, `time`, `tz`, `snoozed_until`, `last_answer_date`). It is **separate from
-the "reminder through your front-door bot" option**, which pings you through a different bot; you can have either,
-both or neither. Offered at setup (default off) and shown, with on/off and the time, in the monthly settings check-in
+## Terminate reminder (v3.2.0, optional; asked at setup, default off; v3.5.19 cadence)
+A nudge, sent by the bot itself in your chat (`src/terminate_reminder.py`), daily or on one weekday, at a time you choose
+(config `terminate_reminder`: `enabled`, `time`, `tz`, `cadence` `"daily"` or `"weekly"`, `weekday` null or 0=Sunday … 6=Saturday,
+`snoozed_until`, `last_answer_date`). A missing `cadence` means daily, so a schedule you already turned on stays as it is.
+It is **separate from the "reminder through your front-door bot" option**, which pings you through a different bot; you can have either,
+both or neither. Offered at setup (default off) and shown, with on/off and "daily at HH:MM" or "weekly (Monday) at HH:MM", in the monthly settings check-in
 (`build_monthly_settings_card`, `terminate_reminder.set_reminder`). It never scans or removes anything by itself.
+
+Setup asks with cards (no free-text box, at most 6 buttons). First card (`cadence_card`): "How often do you want me to remind you to terminate bots?"
+with Daily, Weekly (Monday), Weekly (Tuesday), Weekly (Wednesday), Weekly (Thursday), More days. More days opens `cadence_more_card`:
+"Which day should I remind you?" with Weekly (Friday), Weekly (Saturday), Weekly (Sunday), No, not now.
+No / not now / skip leaves it off and does not ask for a time. Daily or any Weekly (Day) (typed "daily" or "weekly monday" too, via `parse_cadence_answer`)
+then asks for a time. The routine is daily cron `{mm} {hh} * * *` or weekly `{mm} {hh} * * {dow}`.
 
 Message: **"Hey, want to terminate some bots?"**, with a card of exactly three buttons (no free text):
 - **Yes**: starts the normal scan and card flow right now (`handle_answer` returns `start_scan_now` with the same
@@ -640,6 +648,12 @@ Fix: a paid-verified follower (About page "Verified, since September 2026", no c
 ### v3.5.16
 Fix: a published copy gave a new owner a TXT file and told them to remove followers by hand. Cause: the getting-started skill said to sign in with a browser "on this owner's own computer", never named the box browser (computerUse / request_box_help), and had no rule against file handoff. The canonical skill is now in `docs/skills/bot-terminator-getting-started.md`: box-browser sign-in, review in chat in rounds of 5 (link, label, reason, stats), a "Mark all 5 for termination" card, bot-run removal via "Remove this follower" about 10 seconds apart, "Follows you" check, Graveyard log, stop on any X warning; never TXT/DOCX/HTML reports or manual steps (only the CSV backup). New `src/removal_flow.py` and `tests/test_removal_flow_v3516.py`. Template version v3.5.16.
 Update-repo distribution: the package now ships publicly as the `code/` folder of the update repo. The Hive Mind client is send-only (the lesson `import` command is removed; clones never pull lessons). The Hive intake server, its tests and the creator's review tool are not shipped.
+
+### v3.5.20
+Hive Mind now records what an owner teaches their own copy. New feedback kind `capability` (label "Owner-taught capability"; `hive feedback add self_upgrade` is stored as `capability`). After any owner-driven change that adds or changes a method, skill, routine, storage, or workflow so THIS copy does something the shipped build does not, the bot runs `hive feedback add capability "<area>" "<shipped behavior>" "<generalized new capability>"`. Same scrub as other Hive lines (handles, paths, secrets, private quotes, account IDs dropped or masked; 150 characters per part). Eligible after one use. Not urgent unless a separate `broken` item is recorded. Weekly batches, not only urgent ones, skip any hash already in `hive_sent_h`; a successful send marks those rows shared so they leave the weekly pool. The template version is read from `VERSION` (fallback kept in lockstep). Every upgrade re-runs `sh tools/install_hive.sh` (or copies `hive/hive.py` to `~/memory/hive.py`) and does not change Hive Mind on/off, turn on removals, messages, logins or deletions, or default a new optional setting on; snapshot first and roll back on failure. `hive_review.py list` and the feedback digest have an "Owner-taught capabilities" section. Template version v3.5.20.
+
+### v3.5.19
+The optional Terminate reminder (still off by default) asks new owners how often, then what time. First card: "How often do you want me to remind you to terminate bots?" with Daily, Weekly (Monday), Weekly (Tuesday), Weekly (Wednesday), Weekly (Thursday), More days (no free-text box). More days: "Which day should I remind you?" with Weekly (Friday), Weekly (Saturday), Weekly (Sunday), No, not now. No / not now / skip leaves it off and does not ask for a time. Daily or Weekly (Day) asks for a time, then creates a daily cron `{mm} {hh} * * *` or weekly `{mm} {hh} * * {dow}` (0=Sunday … 6=Saturday). Typed "daily" and "weekly monday" parse too. Config gains `cadence` and `weekday`; a missing cadence stays daily, and an owner who already has a schedule is not asked again. Status, Book lines and the monthly check-in say "daily at HH:MM" or "weekly (Monday) at HH:MM". Template version v3.5.19.
 
 ### v3.5.18
 Bot Terminator sets its own profile picture. The getting-started skill has a new unconditional Step 0, run by the bot itself before any question or delegation: download `skills/bot-terminator-getting-started/bot-terminator-avatar.jpg` from the public update repo to `/workspace/bot-terminator-avatar.jpg` (retry once), read the UpdateAvatar schema (GetDynamicTools, namespace cursor), call UpdateAvatar set with that local path, confirm in one line, or say "I couldn't set my profile picture just now; ask me anytime to try again" and carry on. Updates apply `profile/avatar.png` (512x512 PNG) the same way (UPGRADE.md 5b). Image copies in `assets/`. New `tests/test_avatar_v3518.py`. Template version v3.5.18.

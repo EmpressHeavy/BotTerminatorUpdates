@@ -161,6 +161,8 @@ def test_every_card_builder_has_at_most_six_options(root, beta_env):
     import terminate_reminder as tr
     chk("terminate_reminder.card", [o["label"] for o in tr.card()["options"]])
     chk("terminate_reminder.time_card", [o["label"] for o in tr.time_card()["options"]])
+    chk("terminate_reminder.cadence_card", [o["label"] for o in tr.cadence_card()["options"]])
+    chk("terminate_reminder.cadence_more_card", [o["label"] for o in tr.cadence_more_card()["options"]])
     import hive_setup as hs
     chk("hive_setup.off_request_card", hs.off_request_card()["buttons"])
     chk("build_monthly_settings_card.build_toggle_card", bmc.build_toggle_card({}, True)["options"])
@@ -174,6 +176,7 @@ EXPECTED_BUILDERS = {"lists_scan.scope_card", "list_cards.build_cards", "list_ca
                      "inactive_mutuals.build_card", "build_monthly_settings_card.build",
                      "build_monthly_settings_card.build(prior)",
                      "terminate_reminder.card", "terminate_reminder.time_card",
+                     "terminate_reminder.cadence_card", "terminate_reminder.cadence_more_card",
                      "records.setup_card", "records.upgrade_card", "records.migration_card",
                      "hive_setup.off_request_card", "build_monthly_settings_card.build_toggle_card"}
 

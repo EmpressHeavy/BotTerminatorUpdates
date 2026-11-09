@@ -36,5 +36,10 @@ def test_offer_mentions_dry_run_not_email():
     assert "email" not in feedback.OFFER.lower() and "exactly" in feedback.OFFER
 
 
+def test_template_version_reads_package_file():
+    ver = (ROOT / "VERSION").read_text().strip()
+    assert feedback.TEMPLATE_VERSION == ver == "v3.5.20"
+
+
 def test_package_has_no_creator_address():
     assert "botterminator@" not in (ROOT / "src" / "feedback.py").read_text().replace('"', "")

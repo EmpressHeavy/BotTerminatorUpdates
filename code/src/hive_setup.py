@@ -74,6 +74,23 @@ def status_line(enabled: bool | None) -> str:
     return f"Hive Mind: {'ON' if enabled else 'OFF'}. {REMINDER}"
 
 
+def upgrade_client_plan() -> dict:
+    """Every template upgrade refreshes the installed Hive Mind client so it matches this package.
+
+    Snapshot first. On failure, roll the copied files back with the rest of the update. This never runs
+    `hive on` or `hive off`, and it never turns on removals, messages, logins or deletions. New optional
+    settings stay off. The owner's Hive Mind on/off flag is not changed.
+    """
+    return {"when": "every upgrade, after the new code is in place and tests pass, before the updated note",
+            "snapshot_first": True,
+            "rollback_on_failure": ["~/memory/hive.py", "~/memory/VERSION", "~/bin/hive"],
+            "steps": ["sh tools/install_hive.sh"],
+            "or_copy": 'cp hive/hive.py "$HOME/memory/hive.py"',
+            "preserves_hive_enabled": True,
+            "does_not": ["hive on", "hive off", "removals", "blocks", "messages", "posts", "logins", "deletions"],
+            "new_optional_default": "off"}
+
+
 def monthly_routine_action(enabled: bool, routine_exists: bool, mem_db: str | None = None, tz: str | None = None):
     """Keep the weekly routine only while Hive Mind is on."""
     if enabled and not routine_exists:

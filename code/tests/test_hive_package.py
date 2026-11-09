@@ -19,6 +19,22 @@ def test_install_helper_copies_byte_identical(tmp_path):
     assert out.stdout.startswith("enabled=0")
 
 
+def test_rerun_refreshes_client_without_changing_hive_switch(tmp_path):
+    env = {**os.environ, "HOME": str(tmp_path), "MEM_DB": str(tmp_path / "memory/brain.db")}
+    subprocess.run(["sh", str(ROOT / "tools/install_hive.sh")], check=True, env=env, capture_output=True)
+    hive = str(tmp_path / "bin/hive")
+    off = subprocess.run([hive, "status"], env=env, capture_output=True, text=True, check=True)
+    assert off.stdout.startswith("enabled=0")
+    subprocess.run([hive, "on", "--bot", "bt"], env=env, capture_output=True, text=True, check=True)
+    subprocess.run(["sh", str(ROOT / "tools/install_hive.sh")], check=True, env=env, capture_output=True)
+    on = subprocess.run([hive, "status"], env=env, capture_output=True, text=True, check=True)
+    assert on.stdout.startswith("enabled=1")
+    assert (tmp_path / "memory/hive.py").read_bytes() == (ROOT / "hive/hive.py").read_bytes()
+    assert (tmp_path / "memory/VERSION").read_text().strip() == (ROOT / "VERSION").read_text().strip() == "v3.5.20"
+    script = (ROOT / "tools/install_hive.sh").read_text()
+    assert "hive on" not in script and "hive off" not in script
+
+
 def test_install_script_is_plain_copy():
     sh = (ROOT / "tools/install_hive.sh").read_text()
     assert 'cp "$PKG_DIR/hive/hive.py" "$HOME/memory/hive.py"' in sh

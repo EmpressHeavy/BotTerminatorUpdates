@@ -34,7 +34,7 @@ List checks: {lists} (off by default; you choose at setup and can change it in t
 ## Routines
 - Daily scan at {scan_time} ({time_zone}): one card of likely bots, one card of a few inactive mutuals, and (if list checks are on) a rescan of the lists you're on.
 - Reminder through your front-door bot: {reminder}
-- Terminate reminder (separate from the front-door reminder; the bot's own daily question in chat, "Hey, want to terminate some bots?" with Yes / Remind me later / Not today): {terminate_reminder}
+- Terminate reminder (separate from the front-door reminder; the bot's own question in chat, "Hey, want to terminate some bots?" with Yes / Remind me later / Not today; daily, or weekly on a chosen day): {terminate_reminder}
 - Memory: the bot runs `mem boot "Bot Terminator"` at the start of every session, checks `mem lessons` before a task, uses `mem supersede` instead of adding duplicates, records mistakes with `mem lesson`, never follows [OLD] rows (nothing is deleted; `mem history` shows old ways), and writes scans, rule and setting changes, removals, list actions and project status to your private memory as they happen.
 
 ## Lessons learned

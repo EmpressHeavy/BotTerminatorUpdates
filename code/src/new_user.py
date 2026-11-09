@@ -2,7 +2,8 @@
 
     python -m src.new_user --user <user_key> --handle @your_handle --daily-cap 10 --scan-time 09:00 --lists no   # optional; default no
         [--reminder] [--protect @someone ...] [--manual]
-        [--terminate-reminder yes --terminate-time 18:00]   # optional daily chat nudge; default no
+        [--terminate-reminder yes --terminate-time 18:00]   # optional chat nudge; default no
+        [--terminate-cadence daily|weekly --terminate-weekday 1]  # weekly weekday: 0=Sunday ... 6=Saturday
 
 Asked at setup: the daily removal cap (1-100; start low, e.g. 10) and the daily scan time (HH:MM, your time
 zone), whether to check the lists you're on (default: no). Setup then has the bot create the "Bot Terminator Book"
@@ -10,8 +11,11 @@ rules doc and the log sheet (Actions, Keepers, In review, List Graveyard, Kept L
 tabs are created either way so turning list checks on later needs no sheet change) with the connector plans returned
 by setup_plans().
 
-Also asked: the optional "Terminate reminder" (default: no): once a day, at the time you pick, the bot asks "Hey, want to
-terminate some bots?" in chat with Yes / Remind me later / Not today (src/terminate_reminder.py). It is separate from the
+Also asked: the optional "Terminate reminder" (default: no). A cadence card asks how often (Daily, or Weekly (Day);
+More days opens Friday–Sunday and No, not now). No / not now / skip leaves it off and does not ask for a time.
+Otherwise, at the time you pick, the bot asks "Hey, want to terminate some bots?" in chat with Yes / Remind me later /
+Not today (src/terminate_reminder.py). Daily cron is `mm hh * * *`; weekly is `mm hh * * dow` (0=Sunday ... 6=Saturday).
+A missing cadence stays daily, so an owner who already has a schedule is not asked again. It is separate from the
 front-door reminder.
 
 v3.3.0: every owner gets their own EMPTY private memory (data/users/<user_key>/memory/brain.db, src/memory.py).
@@ -64,6 +68,7 @@ def validate_cap(cap) -> int:
 
 def create_user(user_key: str, handle: str, *, daily_cap, scan_time: str, lists_enabled: bool = False, reminder: bool = False,
                 terminate_reminder_on: bool = False, terminate_reminder_time: str | None = None,
+                terminate_reminder_cadence: str | None = None, terminate_reminder_weekday=None,
                 memory_backup: bool = False, memory_backup_repo: str | None = None,
                 root: str | Path | None = None, protected_handles=(), manual: bool = False,
                 time_zone: str | None = None, records_backup: str = "pending",
@@ -86,7 +91,9 @@ def create_user(user_key: str, handle: str, *, daily_cap, scan_time: str, lists_
                daily_removal_cap=daily_cap,
                daily_scan={"time": scan_time, "reminder_via_front_door": bool(reminder)},
                lists={"enabled": bool(lists_enabled)},
-               terminate_reminder=terminate_reminder.initial_section(terminate_reminder_on, terminate_reminder_time, time_zone),
+               terminate_reminder=terminate_reminder.initial_section(
+                   terminate_reminder_on, terminate_reminder_time, time_zone,
+                   terminate_reminder_cadence, terminate_reminder_weekday),
                memory=memory.initial_section(memory_backup, memory_backup_repo))
     cfg["records"] = records.set_backup(cfg, records_backup, repo=records_repo)["records"]  # v3.5.0
     if time_zone:
@@ -119,8 +126,12 @@ def main(argv=None) -> int:
     a.add_argument("--daily-cap", required=True, type=int, help="1-100; start low, e.g. 10")
     a.add_argument("--scan-time", required=True, help="HH:MM daily scan time"); a.add_argument("--reminder", action="store_true")
     a.add_argument("--terminate-reminder", choices=("yes", "no"), default="no",
-                   help="the bot's own daily chat nudge 'Hey, want to terminate some bots?' (default: no; needs --terminate-time)")
-    a.add_argument("--terminate-time", help="HH:MM daily time for the terminate reminder")
+                   help="the bot's own chat nudge 'Hey, want to terminate some bots?' (default: no; needs --terminate-time)")
+    a.add_argument("--terminate-time", help="HH:MM time for the terminate reminder")
+    a.add_argument("--terminate-cadence", choices=("daily", "weekly"), default=None,
+                   help="daily (default when on) or weekly with --terminate-weekday")
+    a.add_argument("--terminate-weekday",
+                   help="weekly day: 0=Sunday ... 6=Saturday, or a day name such as Monday")
     a.add_argument("--memory-backup", choices=("yes", "no"), default="no", help="back up your memory to a PRIVATE GitHub repo you own (default: no)")
     a.add_argument("--memory-repo", help="owner/name of that private repo")
     a.add_argument("--lists", choices=("yes", "no"), default="no", help="check the X lists you're on (default: no)")
@@ -130,6 +141,7 @@ def main(argv=None) -> int:
         print(create_user(x.user, x.handle, daily_cap=x.daily_cap, scan_time=x.scan_time,
                           reminder=x.reminder, lists_enabled=x.lists == "yes",
                           terminate_reminder_on=x.terminate_reminder == "yes", terminate_reminder_time=x.terminate_time,
+                          terminate_reminder_cadence=x.terminate_cadence, terminate_reminder_weekday=x.terminate_weekday,
                           memory_backup=x.memory_backup == "yes", memory_backup_repo=x.memory_repo, root=x.root, protected_handles=x.protect, manual=x.manual))
     except (ValueError, FileExistsError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr); return 2

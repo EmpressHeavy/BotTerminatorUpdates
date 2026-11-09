@@ -3,8 +3,8 @@ HH:MM in the owner's time zone). Each run: read the Book, scan, then show TWO ca
 and a few inactive mutuals. Nothing is removed without the owner's marks. Optional reminder via the owner's
 front-door bot (a reminder message is an outgoing message: only if the owner turned it on at setup).
 
-Not the same thing: the optional "Terminate reminder" (src/terminate_reminder.py), the bot's own daily "Hey, want to
-terminate some bots?" card in chat. Its Yes button runs scan_steps() below."""
+Not the same thing: the optional "Terminate reminder" (src/terminate_reminder.py), the bot's own "Hey, want to
+terminate some bots?" card in chat (daily, or weekly on a chosen day). Its Yes button runs scan_steps() below."""
 from __future__ import annotations
 
 import re
@@ -47,7 +47,7 @@ def routine_spec(cfg: dict) -> dict:
             "time_zone": cfg.get("time_zone") or "America/Los_Angeles",
             "steps": scan_steps(cfg),
             "reminder_via_front_door": bool(scan.get("reminder_via_front_door")),
-            # the bot's own daily chat nudge is a separate routine (terminate_reminder.routine_spec); nothing here sends it
+            # the bot's own chat nudge (daily or weekly) is a separate routine (terminate_reminder.routine_spec); nothing here sends it
             "terminate_reminder": ({"enabled": True, "time": tr.get("time"), "routine": "Bot Terminator terminate reminder"}
                                    if tr.get("enabled") else {"enabled": False}),
             "removes_without_marks": False}

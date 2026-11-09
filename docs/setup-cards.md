@@ -96,6 +96,70 @@ Generated from the shipped code (`code/src/`), so it matches what the bot sends.
 }
 ```
 
+## `terminate_reminder.cadence_card`
+
+```json
+{
+  "multiSelect": false,
+  "allowCustom": false,
+  "prompt": "How often do you want me to remind you to terminate bots?",
+  "options": [
+    {
+      "label": "Daily",
+      "value": "Daily"
+    },
+    {
+      "label": "Weekly (Monday)",
+      "value": "Weekly (Monday)"
+    },
+    {
+      "label": "Weekly (Tuesday)",
+      "value": "Weekly (Tuesday)"
+    },
+    {
+      "label": "Weekly (Wednesday)",
+      "value": "Weekly (Wednesday)"
+    },
+    {
+      "label": "Weekly (Thursday)",
+      "value": "Weekly (Thursday)"
+    },
+    {
+      "label": "More days",
+      "value": "More days"
+    }
+  ]
+}
+```
+
+## `terminate_reminder.cadence_more_card`
+
+```json
+{
+  "multiSelect": false,
+  "allowCustom": false,
+  "prompt": "Which day should I remind you?",
+  "options": [
+    {
+      "label": "Weekly (Friday)",
+      "value": "Weekly (Friday)"
+    },
+    {
+      "label": "Weekly (Saturday)",
+      "value": "Weekly (Saturday)"
+    },
+    {
+      "label": "Weekly (Sunday)",
+      "value": "Weekly (Sunday)"
+    },
+    {
+      "label": "No, not now",
+      "value": "No, not now"
+    }
+  ]
+}
+```
+
 ## `lists_scan.scope_card`
 
 ```json
@@ -124,8 +188,8 @@ Generated from the shipped code (`code/src/`), so it matches what the bot sends.
   "What time should I run the daily scan? (e.g. 09:00, your time zone)",
   "Want a reminder through your front-door bot when the daily cards are ready? (yes/no; this is a ping through a different bot, separate from the chat nudge asked below)",
   "Want me to also check the X lists you've been added to and flag negative ones? (yes/no; default: no, you can turn it on any time)",
-  "Want me to nudge you once a day, right here in chat, with \"Hey, want to terminate some bots?\" (yes/no; default: no. This is separate from the front-door reminder above)",
-  "What time should I send it? (e.g. 18:00, your time zone; only if you said yes)",
+  "How often do you want me to remind you to terminate bots?",
+  "What time should I send it? (e.g. 18:00 or 6:00 PM, your time zone; only after you pick Daily or a Weekly day)",
   "Want me to back up your private Bot Terminator memory to a GitHub repo you own? (yes/no; default: no. It must be a private repo, and I use your own GitHub login; no tokens are saved anywhere)",
   "Which private repo should I use? (owner/name, e.g. yourname/bot-terminator-memory; only if you said yes)"
 ]

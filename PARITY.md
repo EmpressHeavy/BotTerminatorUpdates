@@ -1,9 +1,9 @@
-# v3.5.18 parity map
+# v3.5.20 parity map
 | Component | Repo location |
 |---|---|
 | Agent profile (name, title, description, welcome message, avatar shape/color) | `profile/profile.json`, `profile/welcome_message.txt` (generic) |
 | Per-agent settings, getting-started link, visibility | `profile/settings.json` |
-| Profile picture | **Not available** (no avatar image exists; profile keeps shape "wedge", color "gray") |
+| Profile picture | `profile/avatar.png`, `skills/bot-terminator-getting-started/bot-terminator-avatar.jpg` |
 | First-run setup flow (corrected v3.5.16) | `skills/bot-terminator-getting-started/SKILL.md` (also `code/docs/skills/bot-terminator-getting-started.md`) |
 | Setup cards, exact wording/options | `docs/setup-cards.md` (generated from `code/src/`) |
 | Bot rules (21 profile-memory rules) | `docs/bot-rules.md` |
@@ -13,8 +13,8 @@
 | Schema (terminator.db, brain.db) and migrations | `code/src/`, `code/README.md` |
 | Install steps and dependencies | `code/README.md`, `code/requirements*.txt`, `UPGRADE.md` step 2 |
 | Package integrity | `code/tools/verify_package.py`, fingerprint in the getting-started skill |
-| Tests (476 pass, 1 skipped) | `code/tests/` |
-| Hive Mind (send-only client, on by default, bot code bt) | `skills/hive-mind/SKILL.md`, `hive/hive.py`, `hive/README.md`, `code/hive/`, `code/tools/install_hive.sh` |
+| Tests (512 pass, 2 skipped) | `code/tests/` |
+| Hive Mind (send-only client, on by default, bot code bt; capability kind) | `skills/hive-mind/SKILL.md`, `hive/hive.py`, `hive/README.md`, `code/hive/`, `code/tools/install_hive.sh` |
 | Creator feedback | `hive/README.md`, monthly prompt |
 | Routines and prompts | `routines/routines.md`, `routines/routine-prompts.md` |
 | Automatic weekly updates (mandatory, always on) | `routines/weekly-update-check.md`, `UPGRADE.md` section A, skill "Automatic updates", monthly check re-creates it |

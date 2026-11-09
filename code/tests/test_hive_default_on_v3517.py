@@ -56,6 +56,19 @@ def test_monthly_toggle_card_and_routine():
     assert hs.monthly_routine_action(True, True) == {}
 
 
+def test_upgrade_refreshes_hive_client_without_flipping_it():
+    plan = hs.upgrade_client_plan()
+    assert plan["steps"] == ["sh tools/install_hive.sh"] and plan["snapshot_first"] and plan["preserves_hive_enabled"]
+    assert plan["new_optional_default"] == "off"
+    assert "hive on" in plan["does_not"] and "hive off" in plan["does_not"]
+    assert "removals" in plan["does_not"] and "logins" in plan["does_not"] and "deletions" in plan["does_not"]
+    joined = SKILL + "\n" + HSKILL
+    assert "hive feedback add capability" in joined and "self_upgrade" in joined
+    assert "sh tools/install_hive.sh" in SKILL and "upgrade_client_plan" in SKILL
+    assert "does not change Hive Mind on/off" in SKILL or "does not turn Hive Mind on or off" in joined
+    assert "snapshot" in SKILL.lower() and "roll back" in SKILL.lower()
+
+
 def test_skills_match():
     for doc in (SKILL, HSKILL):
         assert NOTICE in doc and PROMPT in doc

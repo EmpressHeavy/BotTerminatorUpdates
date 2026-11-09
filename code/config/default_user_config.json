@@ -83,10 +83,12 @@
     "enabled": false,
     "time": null,
     "tz": null,
+    "cadence": "daily",
+    "weekday": null,
     "snoozed_until": null,
     "last_answer_date": null,
     "last_answer": null,
-    "_note": "Optional (v3.2.0, default OFF). The bot's own daily chat nudge 'Hey, want to terminate some bots?' (Yes / Remind me later / Not today). Separate from daily_scan.reminder_via_front_door. See src/terminate_reminder.py."
+    "_note": "Optional (v3.5.19, default OFF). The bot's own chat nudge 'Hey, want to terminate some bots?' (Yes / Remind me later / Not today), daily or weekly. cadence is daily or weekly; weekday is null or 0=Sunday ... 6=Saturday. A missing cadence means daily. Separate from daily_scan.reminder_via_front_door. See src/terminate_reminder.py."
   },
   "memory": {
     "enabled": true,

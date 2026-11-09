@@ -2,8 +2,8 @@
 
 Setting 8 (Last bot cleanup) is listed ONLY when the user entered a last-cleanup date, tool or count at setup.
 Setting 2 covers returnees AND the list checks (on/off, default off).
-Settings 6-7 (pacing, reminders and connectors) include the optional Terminate reminder (the bot's own daily chat
-nudge, on/off + time, default off) next to the front-door reminder; a companion line always shows both, kept apart.
+Settings 6-7 (pacing, reminders and connectors) include the optional Terminate reminder (the bot's own chat
+nudge, on/off, daily or weekly (Day), and time, default off) next to the front-door reminder; a companion line always shows both, kept apart.
 v3.5.0: a companion line shows the records backup (GitHub / cloud CSV / download / Sheets / not yet) for owners with a records section.
 v3.5.17: build_toggle_card lists every on/off setting (including Hive Mind) with its state; only picked ones flip.
 v3.3.0: a companion line shows the optional memory backup (on/off + private repo; default off), under 6-7.
@@ -51,7 +51,8 @@ def lists_line(lists_enabled: bool | None) -> str | None:
 
 def build(prior_cleanup: dict | None = None, lists_enabled: bool | None = None, cfg: dict | None = None) -> dict:
     """lists_enabled (from the user's config) adds a companion line that says whether list checks are on.
-    cfg (the user's own config) fills the Terminate reminder line (on/off, time) and the front-door reminder state;
+    cfg (the user's own config) fills the Terminate reminder line (on/off, daily at HH:MM or weekly (Day) at HH:MM)
+    and the front-door reminder state;
     without it the line shows the default: OFF."""
     line8 = last_cleanup_line(prior_cleanup)
     buttons = ["1. Mode", "2. Returnees and list checks", "3. Always Keep list: your current keeps",

@@ -25,6 +25,41 @@ def write_cfg(root: Path, **over):
     (root / "config" / "license.json").write_text(json.dumps(cfg), encoding="utf-8")
 
 
+def test_register_and_check_send_an_explicit_user_agent(tmp_path, monkeypatch):
+    """urllib's default User-Agent is blocked by Cloudflare error 1010 on the license Worker."""
+    write_cfg(tmp_path)
+    seen = []
+
+    class _Body:
+        def __init__(self, status, raw):
+            self.status = status
+            self._raw = raw
+
+        def read(self):
+            return self._raw
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    def fake_urlopen(req, timeout=None):
+        seen.append(req.get_header("User-agent"))
+        if req.full_url.endswith("/register"):
+            return _Body(201, json.dumps({"install_id": "e" * 32}).encode())
+        return _Body(200, json.dumps({
+            "active": True, "product": "bt", "expires": None,
+            "renew_url": "https://license.example/pay", "price": PRICE,
+        }).encode())
+
+    monkeypatch.setattr(lc.urllib.request, "urlopen", fake_urlopen)
+    assert lc.require("scan", root=tmp_path, now=NOW)["allow"] is True
+    expected = f"BotTerminator/{(ROOT / 'VERSION').read_text(encoding='utf-8').strip()}"
+    assert seen == [expected, expected]
+    assert not any(ua.startswith("Python-urllib") for ua in seen)
+
+
 def test_source_does_not_hardcode_prices():
     text = (ROOT / "src" / "license_check.py").read_text(encoding="utf-8")
     for needle in ("4.49", "8.99", "449", "899"):

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 import urllib.error
 import urllib.request
@@ -17,6 +18,20 @@ from pathlib import Path
 PACKAGE = Path(__file__).resolve().parents[1]
 ACTIONS = ("scan", "removal", "block")
 STATE_NAME = "install_license.json"
+
+
+def package_version() -> str:
+    """First line of the package VERSION file. Fallback matches the current template."""
+    try:
+        line = (PACKAGE / "VERSION").read_text(encoding="utf-8").strip().splitlines()[0].strip()
+    except (OSError, IndexError):
+        line = ""
+    return line if re.fullmatch(r"v\d+(?:\.\d+){1,3}", line or "") else "v3.5.20"
+
+
+def user_agent() -> str:
+    """Cloudflare error 1010 blocks urllib's default User-Agent. Send this on every license call."""
+    return f"BotTerminator/{package_version()}"
 
 
 class LicenseError(RuntimeError):
@@ -81,14 +96,17 @@ def _parse_time(value) -> datetime | None:
     return parsed
 
 
+def _request_headers() -> dict:
+    return {"content-type": "application/json", "User-Agent": user_agent()}
+
+
 def _post(url: str, payload: dict, timeout: float, transport):
     body = json.dumps(payload).encode("utf-8")
+    headers = _request_headers()
     if transport is not None:
         status, raw = transport(url, payload)
         return status, raw
-    req = urllib.request.Request(
-        url, data=body, headers={"content-type": "application/json"}, method="POST",
-    )
+    req = urllib.request.Request(url, data=body, headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=timeout) as res:
             return res.status, res.read()

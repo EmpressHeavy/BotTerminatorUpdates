@@ -6,7 +6,8 @@ Not an updater release. `VERSION` is still v3.5.20, so installs that follow `mai
 
 - License server in `license-server/` (Workers + D1, free tier). Prices are in `license-server/prices.json`: Bot Terminator $4.49/month, Follower Finder $4.49/month, both $8.99/month.
 - This copy registers an install id and must pass `license_check` before a scan, removal, or block. A lapsed check refuses the work and leaves records and the X login in place. Offline grace defaults to 72 hours after the last active answer.
-- Package fingerprint for `code/` on this branch (`python3 tools/verify_package.py <fp>`): `8fe30fc8b0ce427305aeb6b01f3435b38f750e77cd6b5a5da4de56b4dd048977`
+- License register and check send `User-Agent: BotTerminator/<version>` so Cloudflare does not reject urllib's default agent (error 1010).
+- Package fingerprint for `code/` on this branch (`python3 tools/verify_package.py <fp>`): `a8175dbd408e2f2fbf0b77b582a5c300fa22c6e0fca63cd79a9f442f6c7aac90`
 
 ## v3.5.20
 - Hive Mind records owner-taught capabilities: when an owner teaches this copy a method, skill, routine, storage, or workflow the shipped build does not have, the bot records kind `capability` (`self_upgrade` is an alias) with personal details removed, and includes it in that week's batch under its own heading.

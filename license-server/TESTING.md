@@ -103,7 +103,7 @@ python3 -m src.license_check register
 python3 -m src.license_check require scan
 ```
 
-The second command should exit 2 and print that the subscription isn't active, with a renew link. It does not delete local records.
+The second command should exit 2 and print that the subscription isn't active, with a renew link. It does not delete local records. Register and check send `User-Agent: BotTerminator/<version>` (from `code/VERSION`). Cloudflare error 1010 blocks urllib's default agent on this Worker; curl was not blocked.
 
 Open the renew link. Pick Bot Terminator ($4.49). Pay with the test card `4242...`. Return to the bot and run `require scan` again. It should print `subscription active`.
 

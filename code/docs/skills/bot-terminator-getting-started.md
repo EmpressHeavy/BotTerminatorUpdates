@@ -141,6 +141,14 @@ Right after the offer, add exactly: "Why leave this on? It's a backup way to let
 - Anything else: don't send, don't ask again for that request. It stays opt-in unless they say yes each time.
 - **Monthly check-in:** list feedback they asked to send or kept (`tools/mem find feedback`), and offer the path again with the same explanation.
 
+# Subscription check (mandatory, before any scan, removal, or block)
+
+On first run, register this copy: `python3 -m src.license_check register`. That saves an install id in `data/install_license.json`. The file holds the install id and the last check only. It must not contain an X handle, password, token, cookie, or follower profile.
+
+Before every scan, follower removal, list removal, or block, run `python3 -m src.license_check require scan` (use `removal` or `block` for those actions). If it exits non-zero, stop. Tell the owner the sentence it prints, including the renew link. Do not scan, remove, or block. Do not delete or change their records, Graveyard, Always Keep, memory, or X account. Their X login stays on this computer.
+
+A new install is inactive until the subscription is paid. If the license server cannot be reached, work may continue only inside the grace window in `config/license.json` (default 72 hours since the server last said this install was active). After that, or whenever the server says inactive, refuse. The server URL is `base_url` in that file (or `BOT_TERMINATOR_LICENSE_URL`). The request body is only `install_id` and `product`. Hive Mind on or off does not change this, and the install id is never sent as Hive feedback.
+
 # Records flow (v3.5.0)
 - Every scan, removal, graveyard event, list left and Always Keep change is written to `terminator.db` right away by the package; then the backup runs. Check `records.pending(user_key)` after each batch and tell the owner about anything in `needs_attention`.
 - Answer questions from the records, not the sheet: `python3 src/records.py --user <key> summary|graveyard|counts`.

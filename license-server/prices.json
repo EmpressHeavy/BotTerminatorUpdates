@@ -1,0 +1,18 @@
+{
+  "currency": "usd",
+  "interval": "month",
+  "products": {
+    "bt": {
+      "label": "Bot Terminator",
+      "amount_cents": 449
+    },
+    "ff": {
+      "label": "Follower Finder",
+      "amount_cents": 449
+    },
+    "both": {
+      "label": "Bot Terminator and Follower Finder",
+      "amount_cents": 899
+    }
+  }
+}

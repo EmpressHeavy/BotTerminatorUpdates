@@ -8,4 +8,3 @@
 - Per-owner data stays under `data/users/<user_key>/` on the owner's own bot computer; never shared or copied. GitHub backup repos must be private and the owner's own.
 - Hive Mind: send-only, on by default (one notice at setup, off anytime on request), anonymized lessons only, never personal info; clones never pull lessons.
 - Updates: only from github.com/EmpressHeavy/BotTerminatorUpdates; see `UPGRADE.md` guardrails. An update can never enable or perform removals, blocks, messages, posts, logins or deletions.
-- Subscription: scans, removals, and blocks wait for `license_check`. A lapsed or unconfirmed install is refused with the renew link. Records stay. The license request carries no X login or profile.

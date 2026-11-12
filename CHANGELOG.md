@@ -1,14 +1,17 @@
 # Changelog
 
+## v3.5.23
+- Bot Terminator is now free for everyone. There is nothing to pay, and no install code or lock card anymore: scans, removals, and blocks no longer wait on a check.
+- Removed `code/src/license_check.py`, `code/config/license.json`, their tests, and the `license-server/` folder. Updating copies delete those files and `data/install_license.json`, and refresh the daily-scan routine prompt. Records, settings, and the X login are kept.
+- Installs and updates still always take the latest VERSION on main, with no older-version menu.
+- Package fingerprint for `code/` (`python3 tools/verify_package.py <fp>`): `ba66d64c61dcf22f655989725dded5ffe0c4aa7f1d6a3e5724538170428a1b39`
+
 ## v3.5.22
-- An unpaid or unconfirmed install now shows a clickable Subscribe link to https://empressheavy.com/subscribe/?product=bt&install_id=... so the product and install ID are already filled in, and still keeps the license-server `/pay` checkout as a fallback. The bot also shows the install ID so it can be copied.
-- First install and updates from this repo always take the latest VERSION on main. The bot must not offer older versions, tags, or commits, or treat commit messages as a version menu. The subscription check cannot be skipped by installing an older build.
+- First install and updates from this repo always take the latest VERSION on main. The bot must not offer older versions, tags, or commits, or treat commit messages as a version menu.
 - Package fingerprint for `code/` (`python3 tools/verify_package.py <fp>`): `425008a176862d83bee8336408125532db89f2104626afd3c28a156adbd8c5cb`
 
 ## v3.5.21
-- Subscription is $4.49/month, or $8.99/month bundled with Follower Finder, at https://empressheavy.com/subscribe/.
-- Before a scan, removal, or block, this copy checks the license server at https://empress-license.empressheavy.workers.dev. If it is not paid, the bot stops and links to that server's checkout for this install (`/pay?install_id=...&product=bt`) or to https://empressheavy.com/subscribe/. Records and the X login stay put. Offline grace is 72 hours after the last active answer.
-- License register and check send `User-Agent: BotTerminator/<version>` so Cloudflare does not reject urllib's default agent (error 1010).
+- Paid-plan release, withdrawn in v3.5.23 (Bot Terminator is free).
 - Package fingerprint for `code/` (`python3 tools/verify_package.py <fp>`): `4c99c68ee58937a6a52b8f5a8fd2bd4ba08918688e15dafcc1bdfe99a1e411b9`
 
 ## v3.5.20

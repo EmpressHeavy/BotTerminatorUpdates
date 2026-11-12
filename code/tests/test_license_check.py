@@ -85,7 +85,9 @@ def test_inactive_refuses_and_keeps_the_renew_link(tmp_path):
         lc.require("scan", root=tmp_path, now=NOW, transport=transport)
     assert "records are still here" in str(exc.value)
     assert "4.49 USD/month" in str(exc.value)
-    assert "https://license.example/pay" in str(exc.value)
+    install = "a" * 32
+    assert f"https://license.example/pay?install_id={install}&product=bt" in str(exc.value)
+    assert "https://empressheavy.com/subscribe/" in str(exc.value)
     assert seen["payload"] == {"install_id": "a" * 32, "product": "bt"}
     state = json.loads((tmp_path / "data" / "install_license.json").read_text(encoding="utf-8"))
     assert set(state) == {"install_id", "last_active_at", "last_renew_url", "last_price"}
@@ -131,9 +133,59 @@ def test_inactive_is_not_kept_alive_by_an_older_grace_window(tmp_path):
     assert state["last_active_at"] is None
 
 
-def test_removal_runner_refuses_before_any_x_work(tmp_path):
-    with pytest.raises(rr.RefusedError, match="records are still here"):
+def test_shipped_config_uses_the_live_license_server():
+    cfg = json.loads((ROOT / "config" / "license.json").read_text(encoding="utf-8"))
+    assert cfg["base_url"] == "https://empress-license.empressheavy.workers.dev"
+    assert cfg["product"] == "bt"
+
+
+def test_unpaid_message_uses_the_live_pay_link(tmp_path):
+    write_cfg(tmp_path, base_url="https://empress-license.empressheavy.workers.dev")
+    install = "d" * 32
+
+    def transport(url, payload):
+        if url.endswith("/register"):
+            return 201, json.dumps({"install_id": install}).encode()
+        return 200, json.dumps({
+            "active": False, "product": "bt", "expires": None,
+            "renew_url": "https://bt-license-test.empressheavy.workers.dev/pay?install_id=" + install,
+            "price": PRICE,
+        }).encode()
+
+    with pytest.raises(lc.LicenseError, match="isn't active") as exc:
+        lc.require("scan", root=tmp_path, now=NOW, transport=transport)
+    text = str(exc.value)
+    assert f"https://empress-license.empressheavy.workers.dev/pay?install_id={install}&product=bt" in text
+    assert "bt-license-test" not in text
+    assert "https://empressheavy.com/subscribe/" in text
+
+
+def test_removal_runner_refuses_before_any_x_work(tmp_path, monkeypatch):
+    install = "f" * 32
+
+    class _Body:
+        def __init__(self, status, raw):
+            self.status = status
+            self._raw = raw
+
+        def read(self):
+            return self._raw
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    def fake_urlopen(req, timeout=None):
+        if req.full_url.endswith("/register"):
+            return _Body(201, json.dumps({"install_id": install}).encode())
+        return _Body(200, json.dumps({"active": False, "product": "bt", "expires": None, "renew_url": "https://ignored.example"}).encode())
+
+    monkeypatch.setattr(lc.urllib.request, "urlopen", fake_urlopen)
+    with pytest.raises(rr.RefusedError, match="records are still here") as exc:
         rr.run_removals("demo_user", "snap", None, root=tmp_path)
+    assert f"https://empress-license.empressheavy.workers.dev/pay?install_id={install}&product=bt" in str(exc.value)
 
 
 def test_instructions_make_the_check_mandatory():

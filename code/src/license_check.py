@@ -18,6 +18,7 @@ from pathlib import Path
 PACKAGE = Path(__file__).resolve().parents[1]
 ACTIONS = ("scan", "removal", "block")
 STATE_NAME = "install_license.json"
+SUBSCRIBE_PAGE = "https://empressheavy.com/subscribe/"
 
 
 def package_version() -> str:
@@ -26,7 +27,7 @@ def package_version() -> str:
         line = (PACKAGE / "VERSION").read_text(encoding="utf-8").strip().splitlines()[0].strip()
     except (OSError, IndexError):
         line = ""
-    return line if re.fullmatch(r"v\d+(?:\.\d+){1,3}", line or "") else "v3.5.20"
+    return line if re.fullmatch(r"v\d+(?:\.\d+){1,3}", line or "") else "v3.5.21"
 
 
 def user_agent() -> str:
@@ -114,11 +115,21 @@ def _post(url: str, payload: dict, timeout: float, transport):
         return exc.code, exc.read()
 
 
+def subscribe_link(base: str, install_id: str, product: str = "bt") -> str:
+    """Checkout for this install, or the public subscribe page when the install id is not known yet."""
+    if base and install_id:
+        return f"{base.rstrip('/')}/pay?install_id={install_id}&product={product or 'bt'}"
+    return SUBSCRIBE_PAGE
+
+
 def _message(kind: str, *, price: dict | None, renew_url: str, grace_hours: float) -> str:
     label = (price or {}).get("label") or "Bot Terminator"
     display = (price or {}).get("display") or ""
     priced = f" ({display})" if display else ""
-    link = f" You can renew here: {renew_url}" if renew_url else ""
+    if renew_url and renew_url != SUBSCRIBE_PAGE:
+        link = f" You can subscribe here: {renew_url} or at {SUBSCRIBE_PAGE}."
+    else:
+        link = f" You can subscribe here: {SUBSCRIBE_PAGE}."
     if kind == "inactive":
         return (f"Your {label} subscription{priced} isn't active, so I'm not going to scan, remove, or block "
                 f"anyone right now. Your records are still here, and I haven't changed your X account.{link}")
@@ -136,11 +147,11 @@ def evaluate(payload: dict | None, *, now: datetime, last_active_at, grace_hours
     """Decide whether an action may proceed. Unreachable uses the grace window. Inactive does not."""
     if not unreachable and payload is not None:
         if payload.get("active") is True:
-            return {"allow": True, "reason": "active", "renew_url": payload.get("renew_url") or renew_url,
+            return {"allow": True, "reason": "active", "renew_url": renew_url,
                     "price": payload.get("price") or price}
         return {"allow": False, "reason": "inactive",
                 "message": _message("inactive", price=payload.get("price") or price,
-                                    renew_url=payload.get("renew_url") or renew_url, grace_hours=grace_hours)}
+                                    renew_url=renew_url, grace_hours=grace_hours)}
     last = _parse_time(last_active_at)
     if last is not None and now - last <= timedelta(hours=float(grace_hours)):
         return {"allow": True, "reason": "grace", "renew_url": renew_url, "price": price}
@@ -152,21 +163,22 @@ def evaluate(payload: dict | None, *, now: datetime, last_active_at, grace_hours
 def register(*, root=None, transport=None, config=None) -> dict:
     cfg = config or load_config(root)
     base = str(cfg.get("base_url") or "").rstrip("/")
+    page = SUBSCRIBE_PAGE
     if not base:
-        raise LicenseError(_message("never", price=None, renew_url="", grace_hours=float(cfg.get("grace_hours") or 72)),
+        raise LicenseError(_message("never", price=None, renew_url=page, grace_hours=float(cfg.get("grace_hours") or 72)),
                            reason="unconfigured")
     try:
         status, raw = _post(f"{base}/register", {}, float(cfg.get("timeout_seconds") or 10), transport)
     except Exception:
-        raise LicenseError(_message("never", price=None, renew_url="", grace_hours=float(cfg.get("grace_hours") or 72)),
+        raise LicenseError(_message("never", price=None, renew_url=page, grace_hours=float(cfg.get("grace_hours") or 72)),
                            reason="unreachable") from None
     if status != 201:
-        raise LicenseError(_message("never", price=None, renew_url="", grace_hours=float(cfg.get("grace_hours") or 72)),
+        raise LicenseError(_message("never", price=None, renew_url=page, grace_hours=float(cfg.get("grace_hours") or 72)),
                            reason="unreachable")
     body = json.loads(raw if isinstance(raw, str) else raw.decode("utf-8"))
     install_id = str(body.get("install_id") or "")
     if not install_id:
-        raise LicenseError(_message("never", price=None, renew_url="", grace_hours=float(cfg.get("grace_hours") or 72)),
+        raise LicenseError(_message("never", price=None, renew_url=page, grace_hours=float(cfg.get("grace_hours") or 72)),
                            reason="unreachable")
     state = load_state(root)
     state["install_id"] = install_id
@@ -184,10 +196,11 @@ def require(action: str, *, root=None, now: datetime | None = None, transport=No
     now = now or datetime.now(timezone.utc)
     if now.tzinfo is None:
         now = now.replace(tzinfo=timezone.utc)
+    product = cfg.get("product") or "bt"
+    link = subscribe_link(base, state.get("install_id") or "", product)
     if not base:
         decision = evaluate(None, now=now, last_active_at=state.get("last_active_at"), grace_hours=grace,
-                            unreachable=True, renew_url=state.get("last_renew_url") or "",
-                            price=state.get("last_price"))
+                            unreachable=True, renew_url=link, price=state.get("last_price"))
         if not decision["allow"]:
             raise LicenseError(decision["message"], reason="unconfigured")
         return decision
@@ -195,11 +208,13 @@ def require(action: str, *, root=None, now: datetime | None = None, transport=No
         try:
             registered = register(root=root, transport=transport, config=cfg)
         except LicenseError:
-            decision = evaluate(None, now=now, last_active_at=None, grace_hours=grace, unreachable=True)
+            decision = evaluate(None, now=now, last_active_at=None, grace_hours=grace, unreachable=True,
+                                renew_url=SUBSCRIBE_PAGE)
             raise LicenseError(decision["message"], reason=decision["reason"]) from None
         state["install_id"] = registered["install_id"]
+    link = subscribe_link(base, state["install_id"], product)
     url = f"{base}/check"
-    payload = {"install_id": state["install_id"], "product": cfg.get("product") or "bt"}
+    payload = {"install_id": state["install_id"], "product": product}
     try:
         status, raw = _post(url, payload, float(cfg.get("timeout_seconds") or 10), transport)
         body = json.loads(raw if isinstance(raw, str) else raw.decode("utf-8"))
@@ -210,10 +225,9 @@ def require(action: str, *, root=None, now: datetime | None = None, transport=No
         body = None
         unreachable = True
     decision = evaluate(body, now=now, last_active_at=state.get("last_active_at"), grace_hours=grace,
-                        unreachable=unreachable, renew_url=state.get("last_renew_url") or "",
-                        price=state.get("last_price"))
+                        unreachable=unreachable, renew_url=link, price=state.get("last_price"))
     if not unreachable and isinstance(body, dict):
-        state["last_renew_url"] = body.get("renew_url") or ""
+        state["last_renew_url"] = link
         state["last_price"] = body.get("price")
         state["last_active_at"] = now.isoformat() if body.get("active") is True else None
         save_state(state, root)

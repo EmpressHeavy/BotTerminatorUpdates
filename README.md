@@ -16,5 +16,8 @@ After that, updates are **automatic and always on**: once a week Bot Terminator 
 - Your records are never overwritten. A snapshot is taken before every update and it rolls back if anything fails.
 - An update never changes the optional settings you chose. New optional features start off and are offered to you as a card.
 
+## Subscription
+Bot Terminator is $4.49/month, or $8.99/month bundled with Follower Finder. Subscribe at https://empressheavy.com/subscribe/.
+
 ## What's here
 `code/` (the Python package, tests, schema, install steps in `code/README.md`), `skills/`, `profile/`, `routines/`, `docs/`, `hive/` (send-only Hive Mind client). Full map: [PARITY.md](PARITY.md). Version: [VERSION](VERSION). Changes: [CHANGELOG.md](CHANGELOG.md).

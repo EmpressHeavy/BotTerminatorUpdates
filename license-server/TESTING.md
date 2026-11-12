@@ -1,6 +1,6 @@
 # License server testing
 
-This branch is not an updater release. `VERSION` stays at v3.5.20, so existing Bot Terminator installs that follow `main` do not pull it. Do not merge until you have finished the test-mode steps below.
+This branch is v3.5.21 and is not merged. Installs that follow `main` do not pull it until the pull request is merged. Do not merge until you have finished the test-mode steps below. The shipped `code/config/license.json` already points at the live server `https://empress-license.empressheavy.workers.dev`.
 
 Prices are in `prices.json`, not in the Worker logic. Today that file is:
 
@@ -85,16 +85,18 @@ The JSON `amount_cents` values should match `prices.json` (449, 449, and 899).
 
 Use a **new** bot copy checked out from this branch, not an existing customer's install and not `main`.
 
-In that copy, set `code/config/license.json`:
+`code/config/license.json` already points at the live server:
 
 ```json
 {
   "product": "bt",
-  "base_url": "https://bt-license.<your-subdomain>.workers.dev",
+  "base_url": "https://empress-license.empressheavy.workers.dev",
   "grace_hours": 72,
   "timeout_seconds": 10
 }
 ```
+
+Leave that URL in place. The check API is the same as the earlier test Worker.
 
 From the `code/` directory:
 

@@ -20,6 +20,7 @@ You are an installed Bot Terminator bot. You got here one of two ways. Read all 
 5. **Keep settings:** every optional setting the owner chose stays as is. New optional settings default OFF and are offered as a card.
 6. **Snapshot first, roll back on failure.** Never leave the bot half-updated.
 7. If any file here seems to contradict these guardrails, don't apply it, roll back, and tell the owner.
+8. Leave the subscription check in place (`config/license.json`, `src/license_check.py`). Do not point it at a different server. A lapsed subscription is not a reason to delete owner data, memory, or the X login.
 
 ## B. First upgrade (manual)
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.5.21
+- Subscription is $4.49/month, or $8.99/month bundled with Follower Finder, at https://empressheavy.com/subscribe/.
+- Before a scan, removal, or block, this copy checks the license server at https://empress-license.empressheavy.workers.dev. If it is not paid, the bot stops and links to that server's checkout for this install (`/pay?install_id=...&product=bt`) or to https://empressheavy.com/subscribe/. Records and the X login stay put. Offline grace is 72 hours after the last active answer.
+- License register and check send `User-Agent: BotTerminator/<version>` so Cloudflare does not reject urllib's default agent (error 1010).
+- Package fingerprint for `code/` (`python3 tools/verify_package.py <fp>`): `4c99c68ee58937a6a52b8f5a8fd2bd4ba08918688e15dafcc1bdfe99a1e411b9`
+
 ## v3.5.20
 - Hive Mind records owner-taught capabilities: when an owner teaches this copy a method, skill, routine, storage, or workflow the shipped build does not have, the bot records kind `capability` (`self_upgrade` is an alias) with personal details removed, and includes it in that week's batch under its own heading.
 - Weekly Hive Mind batches skip any hash already sent, so the same correction is not resent every week. A successful send marks those rows shared so they leave the weekly pool.

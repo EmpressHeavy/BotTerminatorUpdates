@@ -53,7 +53,7 @@ def test_alias_is_capability_and_eligible_once(tmp_path, monkeypatch):
         run(hive, "on", "--bot", "bt")
         recs, drop = hive.build(hive.con())
         assert drop == 0 and len(recs) == 1 and recs[0]["k"] == "capability" and recs[0]["n"] == 1
-        assert recs[0]["tv"] == feedback.TEMPLATE_VERSION == "v3.5.20"
+        assert recs[0]["tv"] == feedback.TEMPLATE_VERSION == "v3.5.21"
     finally:
         os.environ.pop("MEM_DB", None)
 
@@ -149,6 +149,6 @@ def test_version_file_is_preferred_over_fallback(tmp_path, monkeypatch):
         monkeypatch.setenv("BT_VERSION_FILE", str(p))
         assert hive.read_template_version() == "v9.9.9"
         monkeypatch.setenv("BT_VERSION_FILE", str(tmp_path / "missing"))
-        assert hive.read_template_version() == "v3.5.20"
+        assert hive.read_template_version() == "v3.5.21"
     finally:
         os.environ.pop("MEM_DB", None)

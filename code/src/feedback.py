@@ -23,7 +23,7 @@ def _package_version() -> str:
         line = (Path(__file__).resolve().parents[1] / "VERSION").read_text(encoding="utf-8").strip().splitlines()[0].strip()
     except (OSError, IndexError):
         line = ""
-    return line if re.fullmatch(r"v\d+(?:\.\d+){1,3}", line or "") else "v3.5.20"
+    return line if re.fullmatch(r"v\d+(?:\.\d+){1,3}", line or "") else "v3.5.21"
 
 TEMPLATE_VERSION = _package_version()
 SUBJECT = "Bot Terminator feedback"

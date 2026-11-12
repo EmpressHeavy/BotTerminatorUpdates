@@ -1,0 +1,23 @@
+name = "bt-license"
+main = "src/index.js"
+compatibility_date = "2026-11-10"
+workers_dev = true
+
+# No account_id. Wrangler uses whichever account you logged into.
+# database_id is a placeholder, not an account id. Replace it with the id
+# printed by `npx wrangler d1 create bt-license` before the first deploy.
+[[d1_databases]]
+binding = "DB"
+database_name = "bt-license"
+database_id = "00000000-0000-0000-0000-000000000000"
+
+[observability]
+enabled = true
+
+# Price IDs are not secrets. Leave them blank until the Stripe Prices exist.
+# Dollar amounts live in prices.json. Do not put amounts here.
+[vars]
+STRIPE_PRICE_BT = ""
+STRIPE_PRICE_FF = ""
+STRIPE_PRICE_BOTH = ""
+PUBLIC_BASE_URL = ""

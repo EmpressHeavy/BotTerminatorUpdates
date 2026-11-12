@@ -2,7 +2,8 @@
 
 ## v3.5.22
 - An unpaid or unconfirmed install now shows a clickable Subscribe link to https://empressheavy.com/subscribe/?product=bt&install_id=... so the product and install ID are already filled in, and still keeps the license-server `/pay` checkout as a fallback. The bot also shows the install ID so it can be copied.
-- Package fingerprint for `code/` (`python3 tools/verify_package.py <fp>`): `5f5414dd0beefb9eb5787f5e7874b7bc569bd3cd294b3a04e2d1560c9445954c`
+- First install and updates from this repo always take the latest VERSION on main. The bot must not offer older versions, tags, or commits, or treat commit messages as a version menu. The subscription check cannot be skipped by installing an older build.
+- Package fingerprint for `code/` (`python3 tools/verify_package.py <fp>`): `425008a176862d83bee8336408125532db89f2104626afd3c28a156adbd8c5cb`
 
 ## v3.5.21
 - Subscription is $4.49/month, or $8.99/month bundled with Follower Finder, at https://empressheavy.com/subscribe/.

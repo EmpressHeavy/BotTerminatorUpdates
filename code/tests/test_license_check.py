@@ -220,3 +220,12 @@ def test_instructions_make_the_check_mandatory():
     assert "do not delete" in skill.lower()
     assert "22." in rules and "license_check" in rules
     assert "license_check require scan" in steps
+    weekly = (REPO / "routines" / "weekly-update-check.md").read_text(encoding="utf-8")
+    upgrade = (REPO / "UPGRADE.md").read_text(encoding="utf-8")
+    for text in (skill, rules, weekly, upgrade):
+        low = text.lower()
+        assert "latest version" in low
+        assert "commit message" in low
+        assert "cannot be skipped" in low and "older" in low
+    assert "--branch main" in skill
+    assert "23." in rules

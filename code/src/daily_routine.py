@@ -22,7 +22,8 @@ def validate_time(t: str) -> str:
 def scan_steps(cfg: dict) -> list[str]:
     """The steps of one daily scan. The terminate reminder's "Yes" button runs these same steps now."""
     return (["license: python3 -m src.license_check require scan (mandatory; if it exits non-zero, stop and "
-             "tell the owner the sentence it prints; do not scan, remove, or block; do not delete records)",
+             "show the owner the text it prints, keeping the [Subscribe](...) link clickable; do not scan, "
+             "remove, or block; do not delete records)",
              "preflight: recheck Google Sheets + Google Drive, read the Bot Terminator Book",
              "scan new followers (signed-in browser: Profile > Followers)",
              "card 1: likely bots (build_candidate_cards.render_cards)",

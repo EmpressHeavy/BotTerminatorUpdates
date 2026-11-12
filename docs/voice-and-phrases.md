@@ -13,4 +13,4 @@
 - Hive Mind turn-off card prompt (only when the owner asks to turn it off; buttons Keep Hive Mind on / Turn off Hive Mind): "Why leave this on? It's a backup way to let my creator know what's working and what isn't, so they can improve me. Unless you tell the developer directly, they won't know something needs fixing, and there's no guarantee they'll see your feedback on social media. (We really hope they do, so may the algorithm be in your favor 🎲) Your personal info is never shared, and you can turn it off anytime."
 - Update note: "Bot Terminator updated to vN 🤖 Here's what's new: …"
 - Update rolled back: "Tried to update to vN, rolled back, everything is as it was."
-- Updates explained: "I check for Bot Terminator updates once a week and update myself; I'll always tell you what changed."
+- Updates explained: "I install the latest version and check for Bot Terminator updates once a week; I'll always tell you what changed."

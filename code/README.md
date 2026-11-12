@@ -649,6 +649,9 @@ Fix: a paid-verified follower (About page "Verified, since September 2026", no c
 Fix: a published copy gave a new owner a TXT file and told them to remove followers by hand. Cause: the getting-started skill said to sign in with a browser "on this owner's own computer", never named the box browser (computerUse / request_box_help), and had no rule against file handoff. The canonical skill is now in `docs/skills/bot-terminator-getting-started.md`: box-browser sign-in, review in chat in rounds of 5 (link, label, reason, stats), a "Mark all 5 for termination" card, bot-run removal via "Remove this follower" about 10 seconds apart, "Follows you" check, Graveyard log, stop on any X warning; never TXT/DOCX/HTML reports or manual steps (only the CSV backup). New `src/removal_flow.py` and `tests/test_removal_flow_v3516.py`. Template version v3.5.16.
 Update-repo distribution: the package now ships publicly as the `code/` folder of the update repo. The Hive Mind client is send-only (the lesson `import` command is removed; clones never pull lessons). The Hive intake server, its tests and the creator's review tool are not shipped.
 
+### v3.5.22
+An unpaid install is shown a clickable Subscribe link to https://empressheavy.com/subscribe/?product=bt&install_id=... (product and install ID already filled in), plus the install ID and the license-server `/pay` fallback. Records and the X login are left as they are. Template version v3.5.22.
+
 ### v3.5.21
 Subscription is $4.49/month, or $8.99/month bundled with Follower Finder, at https://empressheavy.com/subscribe/. Scans, removals, and blocks check https://empress-license.empressheavy.workers.dev first. An unpaid install is told to subscribe at that server's `/pay?install_id=...&product=bt` link or at https://empressheavy.com/subscribe/. Records and the X login are left as they are. Template version v3.5.21.
 

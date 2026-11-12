@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.5.22
+- An unpaid or unconfirmed install now shows a clickable Subscribe link to https://empressheavy.com/subscribe/?product=bt&install_id=... so the product and install ID are already filled in, and still keeps the license-server `/pay` checkout as a fallback. The bot also shows the install ID so it can be copied.
+- Package fingerprint for `code/` (`python3 tools/verify_package.py <fp>`): `PENDING_FINGERPRINT`
+
 ## v3.5.21
 - Subscription is $4.49/month, or $8.99/month bundled with Follower Finder, at https://empressheavy.com/subscribe/.
 - Before a scan, removal, or block, this copy checks the license server at https://empress-license.empressheavy.workers.dev. If it is not paid, the bot stops and links to that server's checkout for this install (`/pay?install_id=...&product=bt`) or to https://empressheavy.com/subscribe/. Records and the X login stay put. Offline grace is 72 hours after the last active answer.

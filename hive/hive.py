@@ -16,7 +16,7 @@ file (fallback below, kept in lockstep by tests)."""
 import sqlite3, sys, os, re, json, hashlib, secrets, datetime, urllib.request, urllib.error
 DB = os.environ.get('MEM_DB', os.path.expanduser('~/memory/brain.db'))
 URL = 'https://hive-mind-intake.empressheavy.workers.dev'
-_FALLBACK_TV = 'v3.5.21'
+_FALLBACK_TV = 'v3.5.22'
 _VER_RX = re.compile(r'^v\d+(?:\.\d+){1,3}$')
 def read_template_version():
     """Package VERSION (first line), else the fallback. Installed copies also read ~/memory/VERSION."""

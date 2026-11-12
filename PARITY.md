@@ -1,4 +1,4 @@
-# v3.5.21 parity map
+# v3.5.22 parity map
 | Component | Repo location |
 |---|---|
 | Agent profile (name, title, description, welcome message, avatar shape/color) | `profile/profile.json`, `profile/welcome_message.txt` (generic) |

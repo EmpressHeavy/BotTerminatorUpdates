@@ -11,6 +11,7 @@ import os
 import re
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -27,7 +28,7 @@ def package_version() -> str:
         line = (PACKAGE / "VERSION").read_text(encoding="utf-8").strip().splitlines()[0].strip()
     except (OSError, IndexError):
         line = ""
-    return line if re.fullmatch(r"v\d+(?:\.\d+){1,3}", line or "") else "v3.5.21"
+    return line if re.fullmatch(r"v\d+(?:\.\d+){1,3}", line or "") else "v3.5.22"
 
 
 def user_agent() -> str:
@@ -115,35 +116,66 @@ def _post(url: str, payload: dict, timeout: float, transport):
         return exc.code, exc.read()
 
 
-def subscribe_link(base: str, install_id: str, product: str = "bt") -> str:
-    """Checkout for this install, or the public subscribe page when the install id is not known yet."""
+def pay_link(base: str, install_id: str, product: str = "bt") -> str:
+    """License-server checkout for this install, used as a fallback if the subscribe page does not open."""
+    product = (product or "bt").strip() or "bt"
+    install_id = (install_id or "").strip()
+    base = (base or "").rstrip("/")
     if base and install_id:
-        return f"{base.rstrip('/')}/pay?install_id={install_id}&product={product or 'bt'}"
-    return SUBSCRIBE_PAGE
+        query = urllib.parse.urlencode([("install_id", install_id), ("product", product)])
+        return f"{base}/pay?{query}"
+    return ""
 
 
-def _message(kind: str, *, price: dict | None, renew_url: str, grace_hours: float) -> str:
+def subscribe_page_url(product: str = "bt", install_id: str = "") -> str:
+    """EmpressHeavy.com subscribe page, with this product (and install id, when known) already filled in."""
+    product = (product or "bt").strip() or "bt"
+    install_id = (install_id or "").strip()
+    query = [("product", product)]
+    if install_id:
+        query.append(("install_id", install_id))
+    return f"{SUBSCRIBE_PAGE}?{urllib.parse.urlencode(query)}"
+
+
+def subscribe_link(base: str, install_id: str, product: str = "bt") -> str:
+    """Pay-link fallback for this install, or the public subscribe page when the install id is not known yet."""
+    return pay_link(base, install_id, product) or subscribe_page_url(product, install_id)
+
+
+def _message(kind: str, *, price: dict | None, renew_url: str, grace_hours: float,
+             install_id: str = "", product: str = "bt") -> str:
     label = (price or {}).get("label") or "Bot Terminator"
     display = (price or {}).get("display") or ""
     priced = f" ({display})" if display else ""
-    if renew_url and renew_url != SUBSCRIBE_PAGE:
-        link = f" You can subscribe here: {renew_url} or at {SUBSCRIBE_PAGE}."
-    else:
-        link = f" You can subscribe here: {SUBSCRIBE_PAGE}."
+    install_id = (install_id or "").strip()
+    product = (product or "bt").strip() or "bt"
+    page = subscribe_page_url(product, install_id)
+    pay = (renew_url or "").strip()
+    if pay.startswith(SUBSCRIBE_PAGE) or pay == page:
+        pay = ""
     if kind == "inactive":
-        return (f"Your {label} subscription{priced} isn't active, so I'm not going to scan, remove, or block "
-                f"anyone right now. Your records are still here, and I haven't changed your X account.{link}")
-    if kind == "grace_over":
-        return (f"I couldn't confirm your {label} subscription, and it's been more than {grace_hours:g} hours "
+        body = (f"Your {label} subscription{priced} isn't active, so I'm not going to scan, remove, or block "
+                f"anyone right now. Your records are still here, and I haven't changed your X account.")
+    elif kind == "grace_over":
+        body = (f"I couldn't confirm your {label} subscription, and it's been more than {grace_hours:g} hours "
                 f"since the last confirmation, so I'm holding off on scans, removals, and blocks. "
-                f"Your records are still here, and I haven't changed your X account.{link}")
-    return (f"I couldn't reach the subscription check for {label}, and this install hasn't been confirmed yet, "
-            f"so I'm holding off on scans, removals, and blocks. Your records are still here, and I haven't "
-            f"changed your X account.{link}")
+                f"Your records are still here, and I haven't changed your X account.")
+    else:
+        body = (f"I couldn't reach the subscription check for {label}, and this install hasn't been confirmed yet, "
+                f"so I'm holding off on scans, removals, and blocks. Your records are still here, and I haven't "
+                f"changed your X account.")
+    parts = [body]
+    if install_id:
+        parts.append(f"Your install ID is `{install_id}`.")
+    parts.append(f"[Subscribe]({page})")
+    if pay:
+        parts.append(f"If that page doesn't open, you can also subscribe here: {pay}")
+    return "\n\n".join(parts)
 
 
 def evaluate(payload: dict | None, *, now: datetime, last_active_at, grace_hours: float,
-             unreachable: bool, renew_url: str = "", price: dict | None = None) -> dict:
+             unreachable: bool, renew_url: str = "", price: dict | None = None,
+             install_id: str = "", product: str = "bt") -> dict:
     """Decide whether an action may proceed. Unreachable uses the grace window. Inactive does not."""
     if not unreachable and payload is not None:
         if payload.get("active") is True:
@@ -151,34 +183,38 @@ def evaluate(payload: dict | None, *, now: datetime, last_active_at, grace_hours
                     "price": payload.get("price") or price}
         return {"allow": False, "reason": "inactive",
                 "message": _message("inactive", price=payload.get("price") or price,
-                                    renew_url=renew_url, grace_hours=grace_hours)}
+                                    renew_url=renew_url, grace_hours=grace_hours,
+                                    install_id=install_id, product=product)}
     last = _parse_time(last_active_at)
     if last is not None and now - last <= timedelta(hours=float(grace_hours)):
         return {"allow": True, "reason": "grace", "renew_url": renew_url, "price": price}
     kind = "grace_over" if last is not None else "never"
     return {"allow": False, "reason": kind,
-            "message": _message(kind, price=price, renew_url=renew_url, grace_hours=grace_hours)}
+            "message": _message(kind, price=price, renew_url=renew_url, grace_hours=grace_hours,
+                                install_id=install_id, product=product)}
 
 
 def register(*, root=None, transport=None, config=None) -> dict:
     cfg = config or load_config(root)
     base = str(cfg.get("base_url") or "").rstrip("/")
-    page = SUBSCRIBE_PAGE
+    product = str(cfg.get("product") or "bt")
+    page = subscribe_page_url(product)
     if not base:
-        raise LicenseError(_message("never", price=None, renew_url=page, grace_hours=float(cfg.get("grace_hours") or 72)),
+        raise LicenseError(_message("never", price=None, renew_url=page, grace_hours=float(cfg.get("grace_hours") or 72),
+                                    product=product),
                            reason="unconfigured")
     try:
         status, raw = _post(f"{base}/register", {}, float(cfg.get("timeout_seconds") or 10), transport)
     except Exception:
-        raise LicenseError(_message("never", price=None, renew_url=page, grace_hours=float(cfg.get("grace_hours") or 72)),
+        raise LicenseError(_message("never", price=None, renew_url=page, grace_hours=float(cfg.get("grace_hours") or 72), product=product),
                            reason="unreachable") from None
     if status != 201:
-        raise LicenseError(_message("never", price=None, renew_url=page, grace_hours=float(cfg.get("grace_hours") or 72)),
+        raise LicenseError(_message("never", price=None, renew_url=page, grace_hours=float(cfg.get("grace_hours") or 72), product=product),
                            reason="unreachable")
     body = json.loads(raw if isinstance(raw, str) else raw.decode("utf-8"))
     install_id = str(body.get("install_id") or "")
     if not install_id:
-        raise LicenseError(_message("never", price=None, renew_url=page, grace_hours=float(cfg.get("grace_hours") or 72)),
+        raise LicenseError(_message("never", price=None, renew_url=page, grace_hours=float(cfg.get("grace_hours") or 72), product=product),
                            reason="unreachable")
     state = load_state(root)
     state["install_id"] = install_id
@@ -197,10 +233,12 @@ def require(action: str, *, root=None, now: datetime | None = None, transport=No
     if now.tzinfo is None:
         now = now.replace(tzinfo=timezone.utc)
     product = cfg.get("product") or "bt"
-    link = subscribe_link(base, state.get("install_id") or "", product)
+    install_id = state.get("install_id") or ""
+    link = pay_link(base, install_id, product)
     if not base:
         decision = evaluate(None, now=now, last_active_at=state.get("last_active_at"), grace_hours=grace,
-                            unreachable=True, renew_url=link, price=state.get("last_price"))
+                            unreachable=True, renew_url=link, price=state.get("last_price"),
+                            install_id=install_id, product=product)
         if not decision["allow"]:
             raise LicenseError(decision["message"], reason="unconfigured")
         return decision
@@ -209,10 +247,11 @@ def require(action: str, *, root=None, now: datetime | None = None, transport=No
             registered = register(root=root, transport=transport, config=cfg)
         except LicenseError:
             decision = evaluate(None, now=now, last_active_at=None, grace_hours=grace, unreachable=True,
-                                renew_url=SUBSCRIBE_PAGE)
+                                renew_url="", product=product)
             raise LicenseError(decision["message"], reason=decision["reason"]) from None
         state["install_id"] = registered["install_id"]
-    link = subscribe_link(base, state["install_id"], product)
+    install_id = state["install_id"]
+    link = pay_link(base, install_id, product)
     url = f"{base}/check"
     payload = {"install_id": state["install_id"], "product": product}
     try:
@@ -225,7 +264,8 @@ def require(action: str, *, root=None, now: datetime | None = None, transport=No
         body = None
         unreachable = True
     decision = evaluate(body, now=now, last_active_at=state.get("last_active_at"), grace_hours=grace,
-                        unreachable=unreachable, renew_url=link, price=state.get("last_price"))
+                        unreachable=unreachable, renew_url=link, price=state.get("last_price"),
+                        install_id=state.get("install_id") or "", product=product)
     if not unreachable and isinstance(body, dict):
         state["last_renew_url"] = link
         state["last_price"] = body.get("price")

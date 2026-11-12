@@ -86,8 +86,12 @@ def test_inactive_refuses_and_keeps_the_renew_link(tmp_path):
     assert "records are still here" in str(exc.value)
     assert "4.49 USD/month" in str(exc.value)
     install = "a" * 32
-    assert f"https://license.example/pay?install_id={install}&product=bt" in str(exc.value)
-    assert "https://empressheavy.com/subscribe/" in str(exc.value)
+    text = str(exc.value)
+    assert f"https://license.example/pay?install_id={install}&product=bt" in text
+    page = f"https://empressheavy.com/subscribe/?product=bt&install_id={install}"
+    assert f"[Subscribe]({page})" in text
+    assert f"Your install ID is `{install}`." in text
+    assert "https://empressheavy.com/subscribe/" in text
     assert seen["payload"] == {"install_id": "a" * 32, "product": "bt"}
     state = json.loads((tmp_path / "data" / "install_license.json").read_text(encoding="utf-8"))
     assert set(state) == {"install_id", "last_active_at", "last_renew_url", "last_price"}
@@ -157,7 +161,9 @@ def test_unpaid_message_uses_the_live_pay_link(tmp_path):
     text = str(exc.value)
     assert f"https://empress-license.empressheavy.workers.dev/pay?install_id={install}&product=bt" in text
     assert "bt-license-test" not in text
-    assert "https://empressheavy.com/subscribe/" in text
+    page = f"https://empressheavy.com/subscribe/?product=bt&install_id={install}"
+    assert f"[Subscribe]({page})" in text
+    assert f"Your install ID is `{install}`." in text
 
 
 def test_removal_runner_refuses_before_any_x_work(tmp_path, monkeypatch):
@@ -186,6 +192,24 @@ def test_removal_runner_refuses_before_any_x_work(tmp_path, monkeypatch):
     with pytest.raises(rr.RefusedError, match="records are still here") as exc:
         rr.run_removals("demo_user", "snap", None, root=tmp_path)
     assert f"https://empress-license.empressheavy.workers.dev/pay?install_id={install}&product=bt" in str(exc.value)
+
+
+
+def test_locked_message_uses_a_prefilled_subscribe_button():
+    """The clickable Subscribe link goes to EmpressHeavy.com with product and install id filled in."""
+    install = "a" * 64
+    page = lc.subscribe_page_url("bt", install)
+    assert page == f"https://empressheavy.com/subscribe/?product=bt&install_id={install}"
+    message = lc._message("inactive", price=PRICE, renew_url=lc.pay_link("https://empress-license.empressheavy.workers.dev", install, "bt"),
+                          grace_hours=72, install_id=install, product="bt")
+    assert f"[Subscribe]({page})" in message
+    assert "Your install ID is `" + install + "`." in message
+    assert "If that page doesn't open, you can also subscribe here: " in message
+    assert f"https://empress-license.empressheavy.workers.dev/pay?install_id={install}&product=bt" in message
+    bare = lc._message("never", price=None, renew_url="", grace_hours=72, product="bt")
+    assert "[Subscribe](https://empressheavy.com/subscribe/?product=bt)" in bare
+    assert "install ID" not in bare
+    assert "/pay?" not in bare
 
 
 def test_instructions_make_the_check_mandatory():

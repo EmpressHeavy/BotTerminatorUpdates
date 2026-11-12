@@ -20,7 +20,7 @@ Bot Terminator turns it on by default at setup (v3.5.17): `hive on --bot bt`, th
 
 - Lesson intake: `https://hive-mind-intake.empressheavy.workers.dev` (built into hive.py, one JSON POST a week, no sign-in or key).
 - Creator feedback: POST `{"type":"feedback","bot":"bt","category":"...","text":"..."}` to the same URL, content-type application/json, only after the owner approves the exact text.
-Client in hive/hive.py matches VERSION (v3.5.21). Re-run `sh tools/install_hive.sh` on every upgrade; it only copies files and does not change Hive Mind on/off.
+Client in hive/hive.py matches VERSION (v3.5.22). Re-run `sh tools/install_hive.sh` on every upgrade; it only copies files and does not change Hive Mind on/off.
 
 ## When to send a report (behavior trigger, not wording)
 Only while Hive Mind is ON (`hive status` shows enabled=1). Judge by **what you ended up doing**, not by the owner's exact words: whenever the owner gets you to do a task differently than the current build (your installed skills and routines) intends, record one report right away. That includes:

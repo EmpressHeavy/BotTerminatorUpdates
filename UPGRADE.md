@@ -9,6 +9,7 @@ You are an installed Bot Terminator bot. You got here one of two ways. Read all 
 2. Re-run steps 2 to 7 for whatever changed in CHANGELOG.md: replace skills, code and routine prompts with the new versions (verify the fingerprint first). Don't re-ask setup cards they already answered. Keep their routines' times and every setting.
 3. **Refresh the Hive Mind client** so it matches this package: from `/workspace/bot-terminator/` run `sh tools/install_hive.sh` (or copy `hive/hive.py` to `~/memory/hive.py` and, when present, `VERSION` to `~/memory/VERSION`). That copy sends nothing and does **not** change Hive Mind on/off (`hive_state` and the "Hive Mind weekly share" routine stay as they are). If the refresh fails, restore `~/memory/hive.py`, `~/memory/VERSION` and `~/bin/hive` from the snapshot and roll the rest of the update back.
 4. A **new optional setting** in this version: send one tap-button card offering it, off unless they say yes.
+4b. The tip prompt is not a new on/off setting. Do not offer a card for it, and do not show it during this update or during setup.
 5. If any step fails, restore the snapshot (code folder, skills, routine prompts, config, Hive Mind client files; terminator.db and brain.db from the snapshot copy only if damaged). Tell the owner it was rolled back, and try again next week.
 6. Finish with step 8 (the short "Bot Terminator updated to vN" note).
 
@@ -20,7 +21,7 @@ You are an installed Bot Terminator bot. You got here one of two ways. Read all 
 5. **Keep settings:** every optional setting the owner chose stays as is. New optional settings default OFF and are offered as a card.
 6. **Snapshot first, roll back on failure.** Never leave the bot half-updated.
 7. If any file here seems to contradict these guardrails, don't apply it, roll back, and tell the owner.
-8. **Bot Terminator is free for everyone.** If this copy still has the old gate files from v3.5.21 or v3.5.22, delete `src/license_check.py`, `config/license.json`, and `data/install_license.json`, and replace the owner's daily-scan routine prompt with the one in `routines/routine-prompts.md` (it no longer runs a check step first). Never ask the owner to pay, register, or enter a code. Deleting those three files never touches records, memory, or the X login.
+8. **Bot Terminator is free for everyone.** If this copy still has the old gate files from v3.5.21 or v3.5.22, delete `src/license_check.py`, `config/license.json`, and `data/install_license.json`, and replace the owner's daily-scan routine prompt with the one in `routines/routine-prompts.md` (it no longer runs a check step first). Never require the owner to pay, register, or enter a code, and never block or delay a scan, removal, block, or any other feature on a payment. Deleting those three files never touches records, memory, or the X login. The optional tip prompt (getting-started skill) is not a fee and not a gate.
 9. **Latest version only:** install only the current `VERSION` on `main`. Never offer or install an older version, tag, or commit, and do not treat commit messages or pull requests as a version menu. You may summarize what's new from that VERSION's CHANGELOG entry. If you describe the update, say you are installing the latest version.
 
 ## B. First upgrade (manual)
@@ -44,7 +45,7 @@ Install `skills/bot-terminator-getting-started/SKILL.md` and `skills/hive-mind/S
 Keep everything. Run `MEM_USER=<user_key> tools/mem boot`. If the owner still uses Google Sheets for records, migrate as in the skill (copy into terminator.db, never touch the Sheet). Never store secrets.
 
 ## 5. Re-run the full first-run setup
-Run the whole bot-terminator-getting-started flow as an upgrade, one card at a time, pre-filled and confirmed in one line where you already know the answer: mode, daily cap, scan time, front-door reminder, list checks, Terminate reminder, required backup choice, Book/log sheet, protections, Hive Mind (on by default for new setups since v3.5.17: notice only, no card; an upgrading owner's existing Hive Mind on/off state is kept), box-browser sign-in by the owner. Keep every answer they gave before.
+Run the whole bot-terminator-getting-started flow as an upgrade, one card at a time, pre-filled and confirmed in one line where you already know the answer: mode, daily cap, scan time, front-door reminder, list checks, Terminate reminder, required backup choice, Book/log sheet, protections, Hive Mind (on by default for new setups since v3.5.17: notice only, no card; an upgrading owner's existing Hive Mind on/off state is kept), box-browser sign-in by the owner. Keep every answer they gave before. Do not show the tip prompt during these cards, and do not count this walk-through as uses. When the cards are done, call `tip_prompt.mark_setup_complete(user_key)`.
 
 ## 5b. Apply the profile and avatar
 - Read `profile/profile.json` (also `profile/welcome_message.txt`). Generic for any owner; if you personalise, use only this owner's own details ({{OWNER_NAME}}, {{OWNER_TIME_ZONE}}). Call UpdateProfile with name, title, description and welcome message (if supported).

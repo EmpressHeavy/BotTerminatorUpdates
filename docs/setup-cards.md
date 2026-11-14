@@ -226,6 +226,24 @@ Generated from the shipped code (`code/src/`), so it matches what the bot sends.
 }
 ```
 
+## `tip_prompt.card`
+
+```json
+{
+  "multiSelect": false,
+  "allowCustom": false,
+  "prompt": "Wow you seem to be using Bot Terminator a lot lately! Would you mind sending my creator a tip? 🪙",
+  "options": [
+    {"label": "Maybe later", "value": "Maybe later"},
+    {"label": "Remind me monthly", "value": "Remind me monthly"}
+  ],
+  "image": "assets/tip/stripe.png",
+  "note": "Tips are optional. Bot Terminator stays free either way."
+}
+```
+
+The image is a pre-generated QR for the Stripe link. Cash App, Venmo, and X Money are clickable links sent with the card. Maybe later keeps a 7-day gap. Remind me monthly, or dismissing the card, switches that gap to 30 days. There is no forever off switch.
+
 ## Cards defined in the skill text
 - **Round review card:** chat message listing the round's accounts (number, x.com/@handle link, label, posts, followers, following, join date, reason), then multi-select "Round N of M: which should I terminate?" with those accounts plus "Mark all 5 for termination" (last round uses its real count). Unmarked accounts will be kept in review.
 - **List cards:** 4 lists plus "Remove me from these lists" and "Keep all these lists".
@@ -233,3 +251,4 @@ Generated from the shipped code (`code/src/`), so it matches what the bot sends.
 - **Hive Mind (on by default, v3.5.17):** no card at setup, only the exact notice in `skills/bot-terminator-getting-started/SKILL.md` step 10. The "Why leave this on?" card (Keep Hive Mind on / Turn off Hive Mind) is shown only when the owner asks to turn it off. Monthly: Hive Mind is one row in the on/off multi-select card, no nudge.
 - **Monthly check-in cards:** see `routines/routine-prompts.md`.
 - There is **no** card for automatic updates (always on).
+- **Optional tip prompt (v3.5.24):** not a setup card and not an on/off setting. After 10 completed scans or work sessions, and then on the cadence above. Never during first-run setup.

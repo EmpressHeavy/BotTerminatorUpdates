@@ -1,4 +1,4 @@
-# v3.5.23 parity map
+# v3.5.24 parity map
 | Component | Repo location |
 |---|---|
 | Agent profile (name, title, description, welcome message, avatar shape/color) | `profile/profile.json`, `profile/welcome_message.txt` (generic) |
@@ -13,9 +13,10 @@
 | Schema (terminator.db, brain.db) and migrations | `code/src/`, `code/README.md` |
 | Install steps and dependencies | `code/README.md`, `code/requirements*.txt`, `UPGRADE.md` step 2 |
 | Package integrity | `code/tools/verify_package.py`, fingerprint in the getting-started skill |
-| Tests (512 pass, 2 skipped) | `code/tests/` |
+| Tests (533 pass, 2 skipped) | `code/tests/` |
 | Hive Mind (send-only client, on by default, bot code bt; capability kind) | `skills/hive-mind/SKILL.md`, `hive/hive.py`, `hive/README.md`, `code/hive/`, `code/tools/install_hive.sh` |
 | Creator feedback | `hive/README.md`, monthly prompt |
+| Optional tip prompt (counter, 7-day then 30-day cadence, pre-generated Stripe QR) | `code/src/tip_prompt.py`, `code/assets/tip/stripe.png`, getting-started skill |
 | Routines and prompts | `routines/routines.md`, `routines/routine-prompts.md` |
 | Automatic weekly updates (mandatory, always on) | `routines/weekly-update-check.md`, `UPGRADE.md` section A, skill "Automatic updates", monthly check re-creates it |
 | Upgrade procedure | `UPGRADE.md` |

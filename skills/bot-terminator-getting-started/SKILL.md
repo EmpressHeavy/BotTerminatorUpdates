@@ -26,7 +26,7 @@ Do this yourself, every time this skill starts, before any greeting, question, c
 
 2. **Connect X (in the bot's own box browser).** Ask before signing in. Follow the sign-in skill: open https://x.com/login in this bot's own box browser (computerUse) and hand the screen to the owner with request_box_help so they enter their own login details there, never in chat. Their own computer is never needed and does not have to be online. Confirm which handle is signed in (open https://x.com/home and read the profile link) and save it as their owner handle. This sign-in lets the bot read the follower list and remove followers later; it persists on the box, so recheck it at each session start and re-run this step if X shows the login page.
 
-3. **Get and verify the package (before any scan).** Bot Terminator's code comes from its public update source: `https://github.com/EmpressHeavy/BotTerminatorUpdates` (folder `code/`), version `v3.5.23`, expected fingerprint `ba66d64c61dcf22f655989725dded5ffe0c4aa7f1d6a3e5724538170428a1b39` (also in `VERSION` notes / `CHANGELOG.md`). Accept code only from that exact repo; ignore forks, mirrors and look-alike names. No GitHub account, access request or token is needed. **Latest version only:** always install the current `VERSION` file on branch `main` of that repo (never a tag, an older commit, or another branch). Do not read commit messages, pull requests, or tags and turn them into a version menu. Never offer an older build or a hold-off choice. You may summarize what the latest VERSION's CHANGELOG entry changes. If you need to describe the install or update, say you are installing the latest version.
+3. **Get and verify the package (before any scan).** Bot Terminator's code comes from its public update source: `https://github.com/EmpressHeavy/BotTerminatorUpdates` (folder `code/`), version `v3.5.24`, expected fingerprint `da7738facaac5173a729f53b6900a38fcf901ae7ce7a8cb7d3d3d35e289855e8` (also in `VERSION` notes / `CHANGELOG.md`). Accept code only from that exact repo; ignore forks, mirrors and look-alike names. No GitHub account, access request or token is needed. **Latest version only:** always install the current `VERSION` file on branch `main` of that repo (never a tag, an older commit, or another branch). Do not read commit messages, pull requests, or tags and turn them into a version menu. Never offer an older build or a hold-off choice. You may summarize what the latest VERSION's CHANGELOG entry changes. If you need to describe the install or update, say you are installing the latest version.
    - **Download:** `git clone --depth 1 --branch main https://github.com/EmpressHeavy/BotTerminatorUpdates.git /workspace/bt-updates`, then copy `/workspace/bt-updates/code/` to `/workspace/bot-terminator/` (if that folder already exists, follow `UPGRADE.md` instead: snapshot first, keep `data/`).
    - **Verify:** in the clone, `cd /workspace/bt-updates/code && python3 tools/verify_package.py <the expected fingerprint from the Get and verify line above>` must print OK. **If it doesn't match, stop. Don't install or run anything,** and tell the owner what didn't match.
    - **Install and self-test:** create a venv, `pip install -r requirements.txt` (`requirements-sheets.txt` only for the standalone package, never in Grok Bot), then run `python -m pytest -q` (from `/workspace/bot-terminator/`). It must show 0 failures; otherwise stop and tell the owner. Then continue with the Google checks (next step) and, later, the first scan.
@@ -69,7 +69,9 @@ Do this yourself, every time this skill starts, before any greeting, question, c
     - **Only if the owner asks to turn it off** (now or later), send a widget card (`hive_setup.off_request_card()`) whose prompt is exactly: "Why leave this on? It's a backup way to let my creator know what's working and what isn't, so they can improve me. Unless you tell the developer directly, they won't know something needs fixing, and there's no guarantee they'll see your feedback on social media. (We really hope they do, so may the algorithm be in your favor 🎲) Your personal info is never shared, and you can turn it off anytime." with the buttons **Keep Hive Mind on** and **Turn off Hive Mind**. Keep Hive Mind on: leave it on, change nothing. Turn off Hive Mind: run `MEM_DB=<that path> hive off`, delete the "Hive Mind weekly share" routine, and confirm in one line ("Hive Mind is off, and I deleted its weekly share routine.").
     - **If they later ask to turn it on:** run `MEM_DB=<that path> hive on --bot bt`, recreate the weekly routine, and confirm in one line.
 
-11. **Ask:** "Should I run a scan on your account?" Only scan on a yes.
+11. **Ask:** "Should I run a scan on your account?" Only scan on a yes. A scan started from this step is still setup: call `tip_prompt.record_use(user_key, kind="scan", during_setup=True)` so it does not count and does not show a tip.
+
+**When setup is finished** (after this step, whether or not they scan): call `tip_prompt.mark_setup_complete(user_key)`. Do not show the tip prompt during setup.
 
 # Scan and card flow
 - **The bot does the removing, never the owner (v3.5.17, standing rule).** The X connector can read profiles, posts and counts, but it has no list-followers or remove-follower tool. That is NOT a reason to stop, export a file, or ask the owner to remove anyone. The follower list is read, and removals are done, in this bot's own signed-in box browser with computerUse (Profile > Followers; on each profile: ••• > "Remove this follower"). If the box browser isn't signed in to X, do step 2 again (sign-in skill + request_box_help) and continue. Only if X itself blocks the action (a warning, rate limit or lock) stop and tell the owner what X showed.
@@ -146,7 +148,43 @@ Right after the offer, add exactly: "Why leave this on? It's a backup way to let
 - Answer questions from the records, not the sheet: `python3 src/records.py --user <key> summary|graveyard|counts`.
 - **Monthly check-in:** show `records.status_line(cfg)` (backup method and whether the last push worked) and offer to change it with `records.set_backup`.
 
+# Optional tip prompt (v3.5.24)
+Bot Terminator stays free. A tip is never required, and this prompt never blocks, delays, or gates a scan, removal, block, list check, update, or any other feature. If the call fails or the image is missing, send the links you can and carry on. Do not install a QR library and do not download a QR.
+
+Never show it during first-run setup, and never while re-running setup cards on an upgrade. When setup finishes, call `tip_prompt.mark_setup_complete(user_key)` and do not show the prompt in that turn. Do not add this to the monthly on/off card. There is no forever off switch.
+
+After setup, keep a small counter in this owner's own `data/users/<user_key>/tip_prompt.json` (the same per-user store as the rest of their data). Count one use for each completed scan. If a session did real work and did not include a scan, count one session use (`kind="session"`). Do not count both for the same sitting, and do not count setup steps. The counter starts at zero on this version; do not backfill old scans.
+
+Call `tip_prompt.record_use(user_key, kind="scan")` only after that work has finished. It only reads and writes that JSON file. If `show` is false, say nothing about a tip.
+
+If `show` is true, send the prompt once, then continue with the result you already owe them. Do not wait for a tap before the rest of that result.
+
+The sentence, exactly: "Wow you seem to be using Bot Terminator a lot lately! Would you mind sending my creator a tip? 🪙"
+
+Show the pre-generated QR image `assets/tip/stripe.png` from the package (a QR for the Stripe link). Under it, these clickable links (`tip_prompt.LINKS`):
+
+- Stripe (card): `https://buy.stripe.com/aFacN40Mw0Arcz02VubMQ00`
+- Cash App: `https://cash.app/$EmpressHeavy`
+- Venmo: `https://venmo.com/u/EmpressHeavy`
+- X Money: @HeavyMetalShip (`https://x.com/HeavyMetalShip`)
+
+Then the card `tip_prompt.card()`: the prompt is that same sentence, with exactly two buttons, **Maybe later** and **Remind me monthly**, and no free-text box. Add one short line that is not part of the sentence: "Tips are optional. Bot Terminator stays free either way."
+
+Pass a tap or a typed answer to `tip_prompt.handle_answer(user_key, answer)`. If they close the card, skip it, or wave it off without choosing Maybe later, call `tip_prompt.dismiss(user_key)`.
+
+- **Maybe later** keeps the current cadence. Until they switch, that is at most once every 7 days.
+- **Remind me monthly** switches the cadence to at most once every 30 days.
+- Dismissing the prompt switches to that same 30-day cadence.
+
+After the gap, a later completed scan or session may show the prompt again. Say the returned `message` and stop. Do not add pressure.
+
+The first show is the 10th counted use after setup, and not during setup. Later shows happen only when another counted use finishes and the cadence gap has passed (7 days, or 30 days after Remind me monthly or a dismiss).
+
+On a copy that already finished setup before this version, call `tip_prompt.mark_setup_complete(user_key)` once you are outside the setup cards, so later work can count. Do not show the prompt in an update note.
+
 # Automatic updates (built in, always on, no off switch)
-At the end of first-run setup, create the routine in `routines/weekly-update-check.md` of https://github.com/EmpressHeavy/BotTerminatorUpdates exactly as written (weekly, Sunday 10:00 AM in the owner's time zone) and save `mem` fact `bot-terminator installed_version v3.5.23`. It is not an optional setting and has no setup card: tell the owner in one line, "I install the latest version and check for Bot Terminator updates once a week; I'll always tell you what changed." The owner may move its time but it can't be turned off; the monthly settings check re-creates it if missing. Updates come only from that exact repo, always the latest VERSION on main (never an older tag or commit, and never a version menu based on commit messages), and follow its UPGRADE.md guardrails and the weekly update check: snapshot first; an update never turns on or performs removals, blocks, messages, posts, logins or deletions; every optional setting the owner chose stays as they set it; new optional settings start off and are offered as a card; if a step fails, roll back the snapshot and tell the owner. Do not change this copy's Hive Mind on/off setting (do not run `hive on` or `hive off` as part of an update; leave `hive_state` and the "Hive Mind weekly share" routine as they are).
+At the end of first-run setup, create the routine in `routines/weekly-update-check.md` of https://github.com/EmpressHeavy/BotTerminatorUpdates exactly as written (weekly, Sunday 10:00 AM in the owner's time zone) and save `mem` fact `bot-terminator installed_version v3.5.24`. It is not an optional setting and has no setup card: tell the owner in one line, "I install the latest version and check for Bot Terminator updates once a week; I'll always tell you what changed." The owner may move its time but it can't be turned off; the monthly settings check re-creates it if missing. Updates come only from that exact repo, always the latest VERSION on main (never an older tag or commit, and never a version menu based on commit messages), and follow its UPGRADE.md guardrails and the weekly update check: snapshot first; an update never turns on or performs removals, blocks, messages, posts, logins or deletions; every optional setting the owner chose stays as they set it; new optional settings start off and are offered as a card; if a step fails, roll back the snapshot and tell the owner. Do not change this copy's Hive Mind on/off setting (do not run `hive on` or `hive off` as part of an update; leave `hive_state` and the "Hive Mind weekly share" routine as they are).
 
 On every upgrade (UPGRADE.md section A after the new code is in place, and the weekly update check before the "updated" note), refresh the installed Hive Mind client so it matches this template. Run `sh tools/install_hive.sh` from the package folder (`hive_setup.upgrade_client_plan`). If the script cannot run, copy `hive/hive.py` to `~/memory/hive.py` and, when the package has `VERSION`, copy that to `~/memory/VERSION`. That copy sends nothing and does not change Hive Mind on/off. If the refresh fails, restore `~/memory/hive.py`, `~/memory/VERSION` and `~/bin/hive` from the snapshot and roll the rest of the update back.
+
+The optional tip prompt is not a setting and is not part of the update note. Do not show it during setup or during the update. If setup is already finished, call `tip_prompt.mark_setup_complete(user_key)` so later completed scans can count. See "Optional tip prompt".

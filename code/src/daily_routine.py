@@ -10,6 +10,10 @@ from __future__ import annotations
 import re
 
 TIME_RE = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
+# Last, and only after results are delivered. Not a gate. See src/tip_prompt.py.
+TIP_STEP = ("optional tip, after the scan results are already delivered and never during first-run setup: "
+            "tip_prompt.record_use(user_key, kind='scan'); send the prompt only when show is true. "
+            "Never wait on it and never block or delay this scan. Bot Terminator stays free.")
 
 
 def validate_time(t: str) -> str:
@@ -20,22 +24,26 @@ def validate_time(t: str) -> str:
 
 
 def scan_steps(cfg: dict) -> list[str]:
-    """The steps of one daily scan. The terminate reminder's "Yes" button runs these same steps now."""
-    return (["preflight: recheck Google Sheets + Google Drive, read the Bot Terminator Book",
+    """The steps of one daily scan. The terminate reminder's "Yes" button runs these same steps now.
+
+    The tip step is last. It does not gate the scan."""
+    steps = ["preflight: recheck Google Sheets + Google Drive, read the Bot Terminator Book",
              "scan new followers (signed-in browser: Profile > Followers)",
              "card 1: likely bots (build_candidate_cards.render_cards)",
              "card 2: inactive mutuals (inactive_mutuals.build_card)"]
-            + (["lists: scope card first (lists_scan.scope_card): 'Only lists from people I don't follow back' "
-                "or 'Show all lists'; that run sticks to the choice",
-                "lists: rescan lists you're on (signed-in browser: Profile > Lists > Lists you're on; "
-                "lists_scan.build_snapshot), report them",
-                "lists: detect soft-blocked owners who added you again (list_runner.detect_returns)",
-                "cards: negative lists, 4 per card + Remove / Keep buttons (list_cards.build_cards); then the "
-                "final skipped-lists card",
-                "on each 'Remove me ...' tap: leave the chosen lists NOW, one at a time (list_flow, "
-                "docs/list_runbook.md); write each list to List Graveyard the moment its task finishes",
-                "card: repeat offenders (list_cards.build_repeat_offender_card)"]
-               if (cfg.get("lists") or {}).get("enabled") else []))
+    if (cfg.get("lists") or {}).get("enabled"):
+        steps += ["lists: scope card first (lists_scan.scope_card): 'Only lists from people I don't follow back' "
+                  "or 'Show all lists'; that run sticks to the choice",
+                  "lists: rescan lists you're on (signed-in browser: Profile > Lists > Lists you're on; "
+                  "lists_scan.build_snapshot), report them",
+                  "lists: detect soft-blocked owners who added you again (list_runner.detect_returns)",
+                  "cards: negative lists, 4 per card + Remove / Keep buttons (list_cards.build_cards); then the "
+                  "final skipped-lists card",
+                  "on each 'Remove me ...' tap: leave the chosen lists NOW, one at a time (list_flow, "
+                  "docs/list_runbook.md); write each list to List Graveyard the moment its task finishes",
+                  "card: repeat offenders (list_cards.build_repeat_offender_card)"]
+    steps.append(TIP_STEP)
+    return steps
 
 
 def routine_spec(cfg: dict) -> dict:

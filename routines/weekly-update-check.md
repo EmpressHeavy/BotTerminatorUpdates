@@ -14,7 +14,7 @@
    - verify the package fingerprint given in the new getting-started skill; on mismatch, stop;
    - after the new code is in place, refresh the Hive Mind client with `sh tools/install_hive.sh` (copy only; does not turn Hive Mind on or off);
    - roll back to the snapshot if any step fails.
-5. When done, send the owner ONE short note: "Bot Terminator updated to v<remote> 🤖 Here's what's new: <2–4 bullets from that version's CHANGELOG.md entry>". If the update brought a new optional setting, add it as a tap-button card that is off unless they say yes.
+5. When done, send the owner ONE short note: "Bot Terminator updated to v<remote> 🤖 Here's what's new: <2–4 bullets from that version's CHANGELOG.md entry>". If the update brought a new optional setting, add it as a tap-button card that is off unless they say yes. The tip prompt is not a setting; do not show it in this note or during the update. It waits for a later completed scan, as in the getting-started skill.
 6. If the update failed and was rolled back, say so in one line ("Tried to update to v<remote>, rolled back, everything is as it was"), record a `hive lesson` if Hive Mind is on, and try again next week.
 7. If the fetch fails, stay silent; after 3 failed weeks in a row, mention it once.
 8. Never run during a removal session; if a run lock is held, wait for it to finish (or try again in an hour, same day).

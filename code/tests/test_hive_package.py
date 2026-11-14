@@ -30,7 +30,7 @@ def test_rerun_refreshes_client_without_changing_hive_switch(tmp_path):
     on = subprocess.run([hive, "status"], env=env, capture_output=True, text=True, check=True)
     assert on.stdout.startswith("enabled=1")
     assert (tmp_path / "memory/hive.py").read_bytes() == (ROOT / "hive/hive.py").read_bytes()
-    assert (tmp_path / "memory/VERSION").read_text().strip() == (ROOT / "VERSION").read_text().strip() == "v3.5.23"
+    assert (tmp_path / "memory/VERSION").read_text().strip() == (ROOT / "VERSION").read_text().strip() == "v3.5.24"
     script = (ROOT / "tools/install_hive.sh").read_text()
     assert "hive on" not in script and "hive off" not in script
 

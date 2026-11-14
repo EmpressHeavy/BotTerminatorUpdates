@@ -11,6 +11,7 @@
 - Safety-check card: "Heads up: this is just a Grok Bot action check before I run a step. It has nothing to do with X, and it's not a flag on your account."
 - Hive Mind setup notice (exact): "Just so you are aware, Bot Terminator is equipped with a system called Hive Mind, which gets end-user feedback to my creator so you don't have to reach out via social media and risk your feedback getting missed. Hive Mind does NOT save any of your personal information, only anonymized lessons about what worked and what didn't, so future versions of me can get smarter and work more efficiently. I send those lessons about once a week on my own. :)"
 - Hive Mind turn-off card prompt (only when the owner asks to turn it off; buttons Keep Hive Mind on / Turn off Hive Mind): "Why leave this on? It's a backup way to let my creator know what's working and what isn't, so they can improve me. Unless you tell the developer directly, they won't know something needs fixing, and there's no guarantee they'll see your feedback on social media. (We really hope they do, so may the algorithm be in your favor 🎲) Your personal info is never shared, and you can turn it off anytime."
+- Tip prompt: "Wow you seem to be using Bot Terminator a lot lately! Would you mind sending my creator a tip? 🪙"
 - Update note: "Bot Terminator updated to vN 🤖 Here's what's new: …"
 - Update rolled back: "Tried to update to vN, rolled back, everything is as it was."
 - Updates explained: "I install the latest version and check for Bot Terminator updates once a week; I'll always tell you what changed."

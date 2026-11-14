@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.5.24
+- Optional tip prompt. A small per-owner counter in `data/users/<user_key>/tip_prompt.json` counts completed scans and work sessions. The first prompt is on the 10th use after setup, then at most once every 7 days. It never appears during first-run setup, and it never blocks or delays a feature. Bot Terminator stays free.
+- The prompt is exactly: "Wow you seem to be using Bot Terminator a lot lately! Would you mind sending my creator a tip? 🪙" with the pre-generated Stripe QR (`code/assets/tip/stripe.png`) and links for Stripe, Cash App, Venmo, and X Money (@HeavyMetalShip).
+- Buttons are Maybe later (keeps the 7-day gap) and Remind me monthly (30 days). Dismissing the prompt also switches to at most once every 30 days. There is no forever off switch.
+- Installs and updates still always take the latest VERSION on main, with no older-version menu.
+- Package fingerprint for `code/` (`python3 tools/verify_package.py <fp>`): `da7738facaac5173a729f53b6900a38fcf901ae7ce7a8cb7d3d3d35e289855e8`
+
 ## v3.5.23
 - Bot Terminator is now free for everyone. There is nothing to pay, and no install code or lock card anymore: scans, removals, and blocks no longer wait on a check.
 - Removed `code/src/license_check.py`, `code/config/license.json`, their tests, and the `license-server/` folder. Updating copies delete those files and `data/install_license.json`, and refresh the daily-scan routine prompt. Records, settings, and the X login are kept.

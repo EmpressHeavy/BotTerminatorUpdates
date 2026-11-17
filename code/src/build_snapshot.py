@@ -13,12 +13,14 @@ try:  # Works both as `python -m src...` and direct script execution.
     from .storage import save_snapshot, save_json
     from .stage1_data import normalize_list_or_api_record
     from .about_account import about_from_record
+    from .protections import is_verified as _is_verified_record
 except ImportError:  # pragma: no cover
     from classify import ActivityFingerprint, Candidate
     from metrics import compute_metrics
     from storage import save_snapshot, save_json
     from stage1_data import normalize_list_or_api_record
     from about_account import about_from_record
+    from protections import is_verified as _is_verified_record
 
 
 def _now() -> datetime:
@@ -175,7 +177,9 @@ def candidate_from_raw(record: dict[str, Any], always_keep: Iterable[Any] = ()) 
         user_id=user_id,
         username=username.lstrip("@"),
         name=name,
-        verified=bool(_bool(_first(record, "verified", "is_verified"))),
+        # v3.5.25: any verified signal (paid blue, camelCase, nested GraphQL, About page) sets verified up front,
+        # so the hard pre-filter runs before any scoring.
+        verified=bool(_bool(_first(record, "verified", "is_verified"))) or _is_verified_record(record),
         followed_by_me=_relationship_bool(record),
         follow_relationship_source=relationship_evidence(record)[1],
         always_keep=keep or bool(_bool(_first(record, "always_keep"))),

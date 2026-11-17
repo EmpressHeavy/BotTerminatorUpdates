@@ -52,8 +52,14 @@ class ProtectionDecision:
 
 
 _VERIFIED_FLAG_KEYS = ("verified", "is_verified", "is_blue_verified", "blue_verified", "legacy_verified",
-                       "verified_badge", "has_checkmark")
-_VERIFIED_TYPE_KEYS = ("verified_type", "verification_type", "badge_type")
+                       "verified_badge", "has_checkmark",
+                       # v3.5.25 (Hive Mind 2026-W47): camelCase / GraphQL / list-scrape spellings of the same badge
+                       "isVerified", "isBlueVerified", "blueVerified", "legacyVerified", "is_verified_organization",
+                       "isVerifiedOrganization", "blue_check", "blue_checkmark", "checkmark", "verified_checkmark",
+                       "paid_verified", "is_paid_verified")
+_VERIFIED_TYPE_KEYS = ("verified_type", "verification_type", "badge_type", "verifiedType", "verificationType")
+# Nested objects some sources use (X GraphQL `legacy`, `verification`, `verification_info`).
+_VERIFIED_NESTED_KEYS = ("verification", "verification_info", "legacy", "core")
 
 
 def _truthy(v: Any) -> bool:
@@ -84,7 +90,13 @@ def verified_reason(account: Any) -> str | None:
     verified_type (blue/business/government, paid or not), or a Verified status on the About page."""
     get = (lambda k: account.get(k)) if isinstance(account, dict) else (lambda k: getattr(account, k, None))
     raw = get("raw") if isinstance(get("raw"), dict) else {}
-    for src in (get, raw.get):
+    sources = [get, raw.get]
+    for holder in (get, raw.get):
+        for nk in _VERIFIED_NESTED_KEYS:
+            nested = holder(nk)
+            if isinstance(nested, dict):
+                sources.append(nested.get)
+    for src in sources:
         for k in _VERIFIED_TYPE_KEYS:
             if _truthy(src(k)):
                 return f"verified ({str(src(k)).strip().lower()})"

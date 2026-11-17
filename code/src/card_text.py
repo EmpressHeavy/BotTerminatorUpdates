@@ -9,12 +9,55 @@ review. Picks come only from the card (no typed-number replies, no all-at-once l
 """
 from __future__ import annotations
 
+import json
+import re
 from typing import Any
 
 CARD_SIZE = 5
 REVIEW_NOTE = "Unmarked accounts will be kept in review."
 MARK_ALL_TERMINATION = "Mark all for termination"
 NA = "Not available"
+
+
+# v3.5.25 (Hive Mind 2026-W47): the select-all answer can arrive as the option value ("mark_all"), the option label
+# ("Mark all 5 for termination", "Mark all for blocking", "Select all"), a JSON-encoded list ('["mark_all"]'),
+# or a list containing any of those. All of them mean "every account on this card". "Mark all except 3" is NOT
+# select-all (callers handle 'except' separately).
+SELECT_ALL_VALUES = ("mark_all", "select_all", "markall", "selectall")
+_SELECT_ALL_RE = re.compile(r"^(?:select|mark)\s+all(?:\s+\d+)?(?:\s+(?:for\s+(?:termination|blocking|removal)"
+                            r"|accounts|of\s+them|on\s+card.*|[\u2014\-:]+.*))?\s*[.!]?$")
+
+
+def _select_all_items(answer: Any) -> list[str]:
+    if answer is None:
+        return []
+    if isinstance(answer, (list, tuple, set)):
+        out: list[str] = []
+        for a in answer:
+            out += _select_all_items(a)
+        return out
+    if isinstance(answer, dict):
+        return _select_all_items(answer.get("value", answer.get("label")))
+    t = str(answer).strip()
+    if t[:1] in "[{\"":
+        try:
+            return _select_all_items(json.loads(t))
+        except ValueError:
+            pass
+    return [t]
+
+
+def is_select_all(answer: Any) -> bool:
+    """True when a card answer (value, label, JSON text or list) is the card's select-all option."""
+    for item in _select_all_items(answer):
+        t = re.sub(r"[\s_]+", " ", item.strip().strip("'\"").lower()).strip()
+        if re.search(r"\b(?:except|but|apart from|other than|minus)\b", t):
+            continue
+        if t.replace(" ", "_") in SELECT_ALL_VALUES or t.replace(" ", "") in SELECT_ALL_VALUES:
+            return True
+        if _SELECT_ALL_RE.match(t):
+            return True
+    return False
 
 
 def _n(v: Any) -> str:

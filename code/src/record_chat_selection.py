@@ -58,6 +58,14 @@ def owner_handle_for(user_key: str) -> str:
     if not h:
         raise ValueError(f"user {user_key!r} has no owner_x_handle in their own config")
     return h if h.startswith("@") else "@" + h
+def _is_select_all(answer) -> bool:
+    try:
+        from card_text import is_select_all
+    except ImportError:  # pragma: no cover
+        from .card_text import is_select_all
+    return is_select_all(answer)
+
+
 PT = ZoneInfo("America/Los_Angeles")
 CHAT_TAB, QUEUE_TAB = "Actions", "In review"
 QUEUE_NOTE_COL = "S"  # 'Chat selection note' column added 2026-10-16
@@ -86,6 +94,13 @@ def parse_answer(raw, card_nums: list[int]) -> tuple[list[int], str]:
     or "mark_all" / "Mark all K for termination"). Numbers outside this round are ignored: there is no
     'type the extra numbers' path and no all-at-once list.
     """
+    if _is_select_all(raw):  # v3.5.25: option value "mark_all" as plain text, JSON text, or label
+        return list(card_nums), "Select all"
+    if isinstance(raw, str) and raw.strip()[:1] == "[":
+        try:
+            raw = json.loads(raw)
+        except ValueError:
+            pass
     if isinstance(raw, (list, tuple)):
         vals = [str(v).strip() for v in raw]
         if any(v.lower() == "mark_all" or v.lower().startswith("mark all") for v in vals):

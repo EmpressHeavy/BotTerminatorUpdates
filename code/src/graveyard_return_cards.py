@@ -20,10 +20,12 @@ try:
     from . import storage as st
     from . import graveyard_returns as gr
     from . import removal_runner as rr
+    from . import card_text as ct
 except ImportError:  # pragma: no cover
     import storage as st
     import graveyard_returns as gr
     import removal_runner as rr
+    import card_text as ct
 
 CARD_SIZE = 5
 MAX_OPTIONS = 6
@@ -117,6 +119,13 @@ def build_flow_for_snapshot(user_key: str, snapshot_id: str, root=None) -> dict:
 def parse_answer(selected, card_nums: list[int]) -> list[int]:
     """selected: list of option labels/values (or a raw string). 'Mark all for blocking' -> whole card.
     Numbers outside this card are ignored. Empty -> []."""
+    if ct.is_select_all(selected):  # v3.5.25: value, label, or JSON text
+        return list(card_nums)
+    if isinstance(selected, str) and selected.strip()[:1] == "[":
+        try:
+            selected = json.loads(selected)
+        except ValueError:
+            pass
     items = [selected] if isinstance(selected, str) else list(selected or [])
     out = []
     for it in items:

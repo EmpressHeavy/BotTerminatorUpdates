@@ -1,19 +1,20 @@
-# v3.5.24 parity map
+# v3.5.25 parity map
 | Component | Repo location |
 |---|---|
 | Agent profile (name, title, description, welcome message, avatar shape/color) | `profile/profile.json`, `profile/welcome_message.txt` (generic) |
 | Per-agent settings, getting-started link, visibility | `profile/settings.json` |
 | Profile picture | `profile/avatar.png`, `skills/bot-terminator-getting-started/bot-terminator-avatar.jpg` |
 | First-run setup flow (corrected v3.5.16) | `skills/bot-terminator-getting-started/SKILL.md` (also `code/docs/skills/bot-terminator-getting-started.md`) |
+| X sign-in fallback browser (v3.5.25), public-repo-only install | getting-started skill step 2 and 3, `UPGRADE.md` guardrail 10, `docs/bot-rules.md` 24–25 |
 | Setup cards, exact wording/options | `docs/setup-cards.md` (generated from `code/src/`) |
-| Bot rules (21 profile-memory rules) | `docs/bot-rules.md` |
+| Bot rules (26 profile-memory rules) | `docs/bot-rules.md` |
 | Tone and signature phrases | `docs/voice-and-phrases.md` |
 | Safety rules | `docs/safety.md`, `UPGRADE.md` guardrails |
 | Scan, scoring, protections, review rounds, removal flow, lists, reminders, records/backup, memory | `code/src/*.py`, `code/tools/` |
 | Schema (terminator.db, brain.db) and migrations | `code/src/`, `code/README.md` |
 | Install steps and dependencies | `code/README.md`, `code/requirements*.txt`, `UPGRADE.md` step 2 |
 | Package integrity | `code/tools/verify_package.py`, fingerprint in the getting-started skill |
-| Tests (533 pass, 2 skipped) | `code/tests/` |
+| Tests (644 pass, 2 skipped) | `code/tests/` |
 | Hive Mind (send-only client, on by default, bot code bt; capability kind) | `skills/hive-mind/SKILL.md`, `hive/hive.py`, `hive/README.md`, `code/hive/`, `code/tools/install_hive.sh` |
 | Creator feedback | `hive/README.md`, monthly prompt |
 | Optional tip prompt (counter, 7-day then 30-day cadence, pre-generated Stripe QR) | `code/src/tip_prompt.py`, `code/assets/tip/stripe.png`, getting-started skill |

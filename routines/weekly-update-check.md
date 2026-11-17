@@ -20,6 +20,7 @@
 8. Never run during a removal session; if a run lock is held, wait for it to finish (or try again in an hour, same day).
 
 ## Hard limits (an update can never cross these)
+- Updates come only from this public repo. Never ask the owner to request access to the creator's private repo, and never request it yourself.
 - An update never turns on or performs follower removals, blocks/soft blocks, list leaves, sending or posting messages, logins/passwords/2FA, or deletions. Those only ever happen in the normal scan and card flow, under the mode and cap the owner chose.
 - The owner's existing optional settings (mode, daily cap, scan time, list checks, Terminate reminder, front-door reminder, backup method, Hive Mind, protections, Always Keep) stay exactly as they chose.
 - New optional settings default to OFF and are only offered as a card.

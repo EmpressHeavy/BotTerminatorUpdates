@@ -31,12 +31,14 @@ try:
     from . import graveyard_returns as gr
     from . import graveyard_return_cards as grc
     from . import review_sheet_writer as rsw
+    from . import card_text as ct
 except ImportError:  # pragma: no cover
     import storage as st
     import removal_runner as rr
     import graveyard_returns as gr
     import graveyard_return_cards as grc
     import review_sheet_writer as rsw
+    import card_text as ct
 
 CARD_SIZE = 5
 MAX_OPTIONS = 6
@@ -147,8 +149,7 @@ def _load(user_key, snapshot_id, root, card_no):
 
 def record_terminate(user_key: str, snapshot_id: str, card_no: int, selected, *, root=None) -> dict:
     num, nums, by_n = _load(user_key, snapshot_id, root, card_no)
-    picked = grc.parse_answer(selected, nums) if not any(str(x) in (MARK_ALL, "mark_all") for x in (selected or [])) \
-        else list(nums)
+    picked = list(nums) if ct.is_select_all(selected) else grc.parse_answer(selected, nums)
     cand = [by_n[n] for n in picked if by_n[n]["type"] == CANDIDATE]
     rets = [by_n[n] for n in picked if by_n[n]["type"] == RETURNEE]
     cfg = st.load_user_config_dict(root, user_key=user_key)

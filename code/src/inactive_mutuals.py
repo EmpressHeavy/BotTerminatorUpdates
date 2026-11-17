@@ -78,8 +78,13 @@ def record_answer(user_key: str, snapshot_id: str, selected, *, root=None, raw_a
     if not num:
         raise ValueError("no inactive-mutuals card for this snapshot")
     by_n = {a["n"]: a for a in num["accounts"]}
-    sel = [str(x) for x in (selected or [])]
-    nums = list(by_n) if any(s in ("mark_all", ct.MARK_ALL_TERMINATION) for s in sel) else \
+    if isinstance(selected, str) and not ct.is_select_all(selected):
+        try:
+            selected = json.loads(selected) if selected.strip()[:1] == "[" else [selected]
+        except ValueError:
+            selected = [selected]
+    sel = [str(x) for x in (selected or [])] if not isinstance(selected, str) else [selected]
+    nums = list(by_n) if ct.is_select_all(selected) else \
         [int(s.split(".")[0]) for s in sel if s.split(".")[0].strip().isdigit() and int(s.split(".")[0]) in by_n]
     chosen = [{"handle": by_n[n]["handle"], "x_user_id": by_n[n]["x_user_id"]} for n in nums]
     if chosen:

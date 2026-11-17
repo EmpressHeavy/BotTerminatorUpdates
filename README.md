@@ -2,6 +2,9 @@
 
 The official update source for the **Bot Terminator** Grok Bot: cleans bot-like, spammy and long-inactive followers off your X account (and, optionally, takes you off unwanted X lists). You review in rounds of 5 and decide; the bot does the removing itself, safely paced, verified and logged.
 
+## New owners: install from here
+Everything is in this public repo; you don't need a GitHub account, an invite, or access to anyone's private repo, and you never need to email anyone for access. Start your Bot Terminator and it installs the latest version from this repo by itself. Your records are backed up to **your own** private GitHub repo (or your own cloud storage or device), which you choose during setup.
+
 ## Upgrade your Bot Terminator (for owners)
 1. Copy this page's link: `https://github.com/EmpressHeavy/BotTerminatorUpdates`
 2. Open your old Bot Terminator chat, paste the link, and say: **"upgrade yourself from this repo"**

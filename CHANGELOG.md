@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.5.25
+Fixes from the 2026-W47 Hive Mind report:
+- **Select all on review cards works.** The "Mark all 5 for termination" choice now selects every account on the card however the answer arrives (the `mark_all` value as plain text, the label, a JSON list, or a list). Before, the plain-text value was recorded as no selection. Same fix for the Graveyard returns, accounts-in-review, and inactive-mutuals cards. "Mark all except 3" still works.
+- **X sign-in fallback.** If X's phone-confirm step hangs in the box browser because its script won't load, the bot reloads once, then installs Firefox (or Chromium) on the box, lets you sign in there, and keeps using that browser. Your login details still never go in chat.
+- **Verified accounts never show up as REVIEW.** The verified check now also reads camelCase, nested, and list-scrape spellings of the paid blue check, and sets it before any scoring, so verified followers are excluded before classification.
+- **Install only from this public repo.** Setup and update instructions point only here. You never need to request access to the creator's private repo; your records go to your own private backup repo (or the backup you chose).
+- Package fingerprint for `code/` (`python3 tools/verify_package.py <fp>`): `50078a2aca5170107cf050a185f6cabd88529ac08babb87ab95faf0f8258b161`
+
 ## v3.5.24
 - Optional tip prompt. A small per-owner counter in `data/users/<user_key>/tip_prompt.json` counts completed scans and work sessions. The first prompt is on the 10th use after setup, then at most once every 7 days. It never appears during first-run setup, and it never blocks or delays a feature. Bot Terminator stays free.
 - The prompt is exactly: "Wow you seem to be using Bot Terminator a lot lately! Would you mind sending my creator a tip? 🪙" with the pre-generated Stripe QR (`code/assets/tip/stripe.png`) and links for Stripe, Cash App, Venmo, and X Money (@HeavyMetalShip).
